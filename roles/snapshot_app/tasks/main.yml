@@ -1,0 +1,36 @@
+---
+- name: Create dumps and archives on a remote host
+  hosts: "{{ target_host }}"
+  gather_facts: false
+
+  tasks:
+    - name: Take a DB dump
+      ansible.builtin.shell: |
+        pg_dump -h sndcb00582p.polygran.noris.de \
+                -U shared_jira_user \
+                -Fc shared_jira \
+                > {{ snapshot_dir }}/{{ now }}_shared-jira.dump
+      become: yes
+      become_user: postgres
+      tags: snapshot_db  # Логика из snapshot_app.sh :contentReference[oaicite:11]{index=11}
+
+    - name: Pack home directory
+      ansible.builtin.shell: |
+        cd /var/atlassian/application-data/jira
+        find ./data/attachments -maxdepth 1 ! -name 'insight' | tail -n +2 > ./tmp/excl_attachments.txt
+        tar --exclude='./caches/*' \
+            --exclude='./data/backbone-issue-sync/*' \
+            --exclude-from='./tmp/excl_attachments.txt' \
+            -zcvf {{ snapshot_dir }}/{{ now }}_shared-jira_homedir.tgz .
+      become: yes
+      become_user: jira
+      tags: snapshot_homedir
+
+    - name: Pack application
+      ansible.builtin.shell: |
+        cd /opt/atlassian/jira/
+        tar --exclude='./temp/*' --exclude='./logs/*' --exclude='./work/*' \
+            -zcvf {{ snapshot_dir }}/{{ now }}_shared-jira_appdata.tgz .
+      become: yes
+      become_user: jira
+      tags: snapshot_appdata

@@ -1,0 +1,147 @@
+# Ansible-Playbook zur Aktualisierung von INT/DEV-Umgebungen
+
+Dieses Projekt enthält einen automatisierten Ansible-Workflow zur Aktualisierung von Atlassian-Umgebungen wie `online-help` und `jira` in einer INT- oder DEV-Umgebung durch Datenübernahme aus PROD.
+
+---
+
+## Voraussetzungen
+
+### Auf deinem Windows-Laptop:
+
+Da Ansible nativ **nicht unter Windows** läuft, benötigst du:
+
+1. **WSL (Windows Subsystem for Linux)** – ermöglicht die Ausführung von Linux-Tools wie Ansible unter Windows
+2. **Ansible** – wird innerhalb von WSL installiert
+
+---
+
+## WSL (Ubuntu) installieren
+
+### 1. PowerShell **als Administrator** öffnen und folgendes ausführen:
+
+```powershell
+wsl --install
+```
+
+> Nach der Installation wirst du einmal neu starten und dann automatisch in Ubuntu (WSL) weiterarbeiten.
+
+Falls du bereits WSL installiert hast, kannst du sicherheitshalber aktualisieren:
+
+```powershell
+wsl --update
+```
+
+---
+
+## Ansible in Ubuntu (WSL) installieren
+
+1. Öffne das WSL-Terminal (Ubuntu)
+2. Führe folgende Befehle aus:
+
+```bash
+sudo apt update
+sudo apt install software-properties-common -y
+sudo add-apt-repository --yes --update ppa:ansible/ansible
+sudo apt install ansible -y
+```
+
+Prüfen, ob Ansible erfolgreich installiert wurde:
+
+```bash
+ansible --version
+```
+
+---
+
+## Projektverzeichnis in WSL aufrufen
+
+Wenn dein Projekt in Windows unter `C:\Users\AmalYuldashev\update_env_ansible` liegt, dann kannst du in WSL dahin wechseln mit:
+
+```bash
+cd /mnt/c/Users/AmalYuldashev/update_env_ansible
+```
+
+---
+
+
+## Playbook ausführen
+
+### Normale Ausführung:
+
+```bash
+ansible-playbook update_env.yml -i inventory.ini
+```
+
+### Testlauf (dry-run):
+
+```bash
+ansible-playbook update_env.yml -i inventory.ini --check --diff
+```
+
+---
+
+## Wichtige Hinweise
+
+* **Verbindung über SSH:** Die Zielsysteme müssen per SSH erreichbar sein.
+* **Python muss auf dem Zielserver vorhanden sein.**
+* **`copy_app.sh` und `extract_app.sh` werden aus `roles/update_env/files/` kopiert und dort ausgeführt.**
+* **Stelle sicher, dass dein SSH-Key auf dem Zielsystem hinterlegt ist oder nutze Passwort-basierte Verbindung.**
+
+---
+
+## Beispiel: Inhalt von `inventory.ini`
+
+```ini
+[int]
+int-hostname ansible_user=remoteuser
+```
+
+---
+
+## Beispiel: Inhalt von `group_vars/all.yml`
+
+```yaml
+ENV_NAME: "online-help"
+CONFLUENCE_USER: "confluence"
+LOCAL_USER: "sascdism"
+REMOTE_HOST: "online-help.merceds-benz.polygran.de"
+LOCAL_ATTACHMENT_DIR: "/var/atlassian/application-data/int/confluence/online-help/attachments/v4"
+REMOTE_ATTACHMENT_DIR: "/var/atlassian/application-data/confluence/online-help/attachments/v4"
+LOCAL_UPLOAD_DIR: "/var/atlassian/application-data/upload"
+COPY_SCRIPT: "/home/sascdism/copy_app.sh"
+EXTRACT_SCRIPT: "/home/confluence/extract_app.sh"
+AUTO_CONFIRM: true
+INCLUDE_ATTACHMENTS: true
+INCLUDE_JIRA_ATTACHMENTS: true
+JIRA_ENV_NAME: "jira"
+JIRA_REMOTE_ATTACHMENTS_DIR: "/var/atlassian/application-data/jira/data"
+JIRA_LOCAL_UPLOAD_DIR: "/var/atlassian/application-data/upload"
+JIRA_LOCAL_ATTACHMENTS_DIR: "/var/atlassian/application-data/jira/data/attachments"
+JIRA_ARCHIVE_NAME: "jira_attachments.tgz"
+```
+
+---
+
+## Beispielhafter Ablauf
+
+1. Stelle sicher, dass du im Projektverzeichnis bist:
+
+```bash
+cd /mnt/c/Users/AmalYuldashev/update_env_ansible
+```
+
+2. Führe das Playbook aus:
+
+```bash
+ansible-playbook update_env.yml -i inventory.ini
+```
+
+Fertig ✅
+
+---
+
+## 📞 Support
+
+Bei Fragen oder Problemen:
+
+* E-Mail: [amal.yuldashev@polygran.de](mailto:amal.yuldashev@polygran.de)

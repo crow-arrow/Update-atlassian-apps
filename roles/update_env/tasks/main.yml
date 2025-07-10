@@ -1,0 +1,43 @@
+---
+- name: Stop service
+  ansible.builtin.service:
+    name: "{{ ENV_NAME }}"
+    state: stopped
+  become: yes
+  tags: stop
+
+- name: Perform copying (snapshot + fetch)
+  import_role:
+    name: snapshot_app
+  tags: snapshot
+- import_role:
+    name: fetch_snapshot
+  tags: fetch
+
+- name: Perform recovery
+  import_role:
+    name: extract_app
+  tags: extract
+
+- name: Sync Confluence Attachments
+  when: INCLUDE_ATTACHMENTS | default(false)
+  block:
+    - name: Rsync attachments
+      ansible.builtin.command: >
+        rsync -av --delete
+        {{ REMOTE_HOST }}:{{ REMOTE_ATTACHMENT_DIR }}/
+        {{ LOCAL_ATTACHMENT_DIR }}/
+      become: yes
+    - name: Restore owner
+      ansible.builtin.file:
+        path: "{{ LOCAL_ATTACHMENT_DIR }}"
+        owner: "{{ CONFLUENCE_USER | default(LOCAL_USER) }}"
+        recurse: yes
+  tags: attachments
+
+- name: Start service
+  ansible.builtin.service:
+    name: "{{ ENV_NAME }}"
+    state: started
+  become: yes
+  tags: start

@@ -1,0 +1,11 @@
+---
+# из jira.env :contentReference[oaicite:9]{index=9}
+ENV_NAME: jira
+JIRA_ENV_NAME: jira
+LOCAL_USER: sascdism
+REMOTE_HOST: mbb-jira.mercedes-benz.polygran.de
+JIRA_LOCAL_UPLOAD_DIR: /var/atlassian/application-data/upload
+JIRA_LOCAL_ATTACHMENTS_DIR: /var/atlassian/application-data/jira/data/attachments
+JIRA_REMOTE_ATTACHMENTS_DIR: /var/atlassian/application-data/jira/data/attachments
+INCLUDE_JIRA_ATTACHMENTS: true
+AUTO_CONFIRM: true

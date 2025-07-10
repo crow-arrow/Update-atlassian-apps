@@ -1,0 +1,43 @@
+---
+- name: Recover data in environment {{ ENV_NAME }}
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+    - name: Configuration backups
+      ansible.builtin.copy:
+        remote_src: yes
+        src: "/var/atlassian/application-data/{{ ENV_NAME }}/jira/{{ instance }}/dbconfig.xml"
+        dest: "/var/atlassian/application-data/{{ ENV_NAME }}/jira/{{ instance }}_dbconfig.xml"
+      tags: pre_extract  # Логика из extract_app.sh :contentReference[oaicite:12]{index=12}
+
+    - name: Unpack DB dump
+      ansible.builtin.command: >
+        pg_restore -h sndcb00581i.polygran.noris.de
+                   -c
+                   --if-exists
+                   -d {{ instance }}_jira_{{ ENV_NAME }}
+                   -U {{ instance }}_jira_user
+                   {{ upload_dir }}/{{ now }}_{{ instance }}.dump
+      tags: extract_db
+
+    - name: Unzip home directory
+      ansible.builtin.unarchive:
+        src: "{{ upload_dir }}/{{ now }}_{{ instance }}_homedir.tgz"
+        dest: "/var/atlassian/application-data/{{ ENV_NAME }}/jira/{{ instance }}/"
+        remote_src: no
+      tags: extract_homedir
+
+    - name: Unzip the application
+      ansible.builtin.unarchive:
+        src: "{{ upload_dir }}/{{ now }}_{{ instance }}_appdata.tgz"
+        dest: "/opt/atlassian/{{ ENV_NAME }}/jira/{{ instance }}/"
+        remote_src: no
+      tags: extract_appdata
+
+    - name: Restore configuration files
+      ansible.builtin.copy:
+        remote_src: yes
+        src: "/var/atlassian/application-data/{{ ENV_NAME }}/jira/{{ instance }}_dbconfig.xml"
+        dest: "/var/atlassian/application-data/{{ ENV_NAME }}/jira/{{ instance }}/dbconfig.xml"
+      tags: post_extract
