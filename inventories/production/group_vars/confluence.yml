@@ -1,11 +1,11 @@
 ---
-# из online-help.env :contentReference[oaicite:10]{index=10}
-ENV_NAME: online-help
+# из pilot-aftersales-confluence.env :contentReference[oaicite:10]{index=10}
+ENV_NAME: pilot-aftersales-confluence
 LOCAL_USER: sascdism
 CONFLUENCE_USER: confluence
 REMOTE_HOST: online-help.mercedes-benz.polygran.de
-LOCAL_UPLOAD_DIR: /var/atlassian/application-data/upload
-LOCAL_ATTACHMENT_DIR: /var/atlassian/application-data/int/confluence/online-help/attachments/v4
-REMOTE_ATTACHMENT_DIR: /var/atlassian/application-data/confluence/online-help/attachments/v4
+INT_UPLOAD_DIR: /var/atlassian/application-data/upload
+INT_ATTACHMENTS_DIR: /var/atlassian/application-data/int/confluence/pilot-aftersales-confluence/attachments/v4
+PROD_ATTACHMENTS_DIR: /var/atlassian/application-data/confluence/pilot-aftersales-confluence/attachments/v4
 INCLUDE_ATTACHMENTS: true
 AUTO_CONFIRM: true

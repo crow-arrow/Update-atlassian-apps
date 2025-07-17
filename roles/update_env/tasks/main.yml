@@ -25,12 +25,12 @@
     - name: Rsync attachments
       ansible.builtin.command: >
         rsync -av --delete
-        {{ REMOTE_HOST }}:{{ REMOTE_ATTACHMENT_DIR }}/
-        {{ LOCAL_ATTACHMENT_DIR }}/
+        {{ REMOTE_HOST }}:{{ PROD_ATTACHMENTS_DIR }}/
+        {{ INT_ATTACHMENTS_DIR }}/
       become: yes
     - name: Restore owner
       ansible.builtin.file:
-        path: "{{ LOCAL_ATTACHMENT_DIR }}"
+        path: "{{ INT_ATTACHMENTS_DIR }}"
         owner: "{{ CONFLUENCE_USER | default(LOCAL_USER) }}"
         recurse: yes
   tags: attachments

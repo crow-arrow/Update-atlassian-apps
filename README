@@ -34,15 +34,20 @@ wsl --update
 ---
 
 ## Ansible in Ubuntu (WSL) installieren
+### Isolated environment
 
 1. Öffne das WSL-Terminal (Ubuntu)
-2. Führe folgende Befehle aus:
+2. Isolate ansible to extra venv:
 
 ```bash
-sudo apt update
-sudo apt install software-properties-common -y
-sudo add-apt-repository --yes --update ppa:ansible/ansible
-sudo apt install ansible -y
+python3 -m venv ansible_env
+source ansible_env/bin/activate
+```
+2. Installiere Ansible durch pip:
+
+```bash
+pip install --upgrade pip
+pip install ansible
 ```
 
 Prüfen, ob Ansible erfolgreich installiert wurde:
@@ -55,10 +60,10 @@ ansible --version
 
 ## Projektverzeichnis in WSL aufrufen
 
-Wenn dein Projekt in Windows unter `C:\Users\AmalYuldashev\update_env_ansible` liegt, dann kannst du in WSL dahin wechseln mit:
+Wenn dein Projekt in Windows unter `C:\Users\<CurrentUser>\update_env_ansible` liegt, dann kannst du in WSL dahin wechseln mit:
 
 ```bash
-cd /mnt/c/Users/AmalYuldashev/update_env_ansible
+cd /mnt/c/Users/<CurrentUser>/update_env_ansible
 ```
 
 ---
@@ -105,18 +110,18 @@ ENV_NAME: "online-help"
 CONFLUENCE_USER: "confluence"
 LOCAL_USER: "sascdism"
 REMOTE_HOST: "online-help.merceds-benz.polygran.de"
-LOCAL_ATTACHMENT_DIR: "/var/atlassian/application-data/int/confluence/online-help/attachments/v4"
-REMOTE_ATTACHMENT_DIR: "/var/atlassian/application-data/confluence/online-help/attachments/v4"
-LOCAL_UPLOAD_DIR: "/var/atlassian/application-data/upload"
+INT_ATTACHMENTS_DIR: "/var/atlassian/application-data/int/confluence/online-help/attachments/v4"
+PROD_ATTACHMENTS_DIR: "/var/atlassian/application-data/confluence/online-help/attachments/v4"
+INT_UPLOAD_DIR: "/var/atlassian/application-data/upload"
 COPY_SCRIPT: "/home/sascdism/copy_app.sh"
 EXTRACT_SCRIPT: "/home/confluence/extract_app.sh"
 AUTO_CONFIRM: true
 INCLUDE_ATTACHMENTS: true
 INCLUDE_JIRA_ATTACHMENTS: true
 JIRA_ENV_NAME: "jira"
-JIRA_REMOTE_ATTACHMENTS_DIR: "/var/atlassian/application-data/jira/data"
-JIRA_LOCAL_UPLOAD_DIR: "/var/atlassian/application-data/upload"
-JIRA_LOCAL_ATTACHMENTS_DIR: "/var/atlassian/application-data/jira/data/attachments"
+JIRA_PROD_ATTACHMENTS_DIR: "/var/atlassian/application-data/jira/data"
+JIRA_INT_UPLOAD_DIR: "/var/atlassian/application-data/upload"
+JIRA_INT_ATTACHMENTS_DIR: "/var/atlassian/application-data/jira/data/attachments"
 JIRA_ARCHIVE_NAME: "jira_attachments.tgz"
 ```
 
