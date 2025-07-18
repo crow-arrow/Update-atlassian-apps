@@ -1,0 +1,11 @@
+- name: Include snapshot task for production
+  include_tasks: snapshot.yml
+  when: env == 'production'
+
+- name: Include restore for dev_int
+  include_tasks: restore.yml
+  when: env == 'dev_int'
+
+- name: Include DB restore for dev_int
+  include_tasks: db_restore.yml
+  when: env == 'dev_int'

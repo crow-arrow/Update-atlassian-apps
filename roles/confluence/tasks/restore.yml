@@ -1,0 +1,20 @@
+- name: Stop Confluence service
+  service:
+    name: confluence
+    state: stopped
+
+- name: Clean install directory
+  file:
+    path: "{{ app_base }}/confluence/{{ instance }}"
+    state: absent
+
+- name: Extract snapshot
+  unarchive:
+    src: "{{ upload_dir }}/confluence_{{ instance }}.tgz"
+    dest: "{{ app_base }}/confluence/"
+    remote_src: yes
+
+- name: Start Confluence service
+  service:
+    name: confluence
+    state: started

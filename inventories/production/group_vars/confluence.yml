@@ -1,11 +1,10 @@
----
-# из pilot-aftersales-confluence.env :contentReference[oaicite:10]{index=10}
-ENV_NAME: pilot-aftersales-confluence
-LOCAL_USER: sascdism
-CONFLUENCE_USER: confluence
-REMOTE_HOST: online-help.mercedes-benz.polygran.de
-INT_UPLOAD_DIR: /var/atlassian/application-data/upload
-INT_ATTACHMENTS_DIR: /var/atlassian/application-data/int/confluence/pilot-aftersales-confluence/attachments/v4
-PROD_ATTACHMENTS_DIR: /var/atlassian/application-data/confluence/pilot-aftersales-confluence/attachments/v4
-INCLUDE_ATTACHMENTS: true
-AUTO_CONFIRM: true
+APP: confluence
+LOCAL_USER: confluence
+SNAPSHOT_SCRIPT: /usr/local/confluence/snapshot_app.sh
+REMOVE_SCRIPT: /usr/local/confluence/remove_snapshot.sh
+SNAPSHOT_SOURCE_DIR: /var/atlassian/application-data/do_not_delete
+TARGET_DIRECTORIES:
+  - /var/atlassian/application-data/int/confluence/{{ ENV_NAME }}
+  - /var/atlassian/application-data/dev/confluence/{{ ENV_NAME }}
+  - /opt/atlassian/int/confluence/{{ ENV_NAME }}
+  - /opt/atlassian/dev/confluence/{{ ENV_NAME }}

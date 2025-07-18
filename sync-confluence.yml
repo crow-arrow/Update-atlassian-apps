@@ -1,0 +1,6 @@
+- name: Manage Confluence instances
+  hosts: confluence
+  become: true
+  roles:
+    - { role: common }
+    - role: confluence

@@ -1,0 +1,8 @@
+ENV_NAME: pilot-aftersales-confluence
+REMOTE_HOST: pilot-aftersales-confluence.mercedes-benz.polygran.de
+ansible_host: sndca00573p.polygran.noris.de
+
+app: confluence
+instance: pilot-aftersales-confluence
+hostname: pilot-aftersales-confluence.mercedes-benz.polygran.de
+db_name: pilot_aftersales_confluence

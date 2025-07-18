@@ -1,2 +1,0 @@
----
-- import_playbook: ../roles/snapshot_app/tasks/main.yml

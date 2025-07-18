@@ -1,0 +1,11 @@
+- name: Restore JIRA PostgreSQL DB
+  postgresql_db:
+    name: "{{ db_name }}"
+    state: present
+    owner: "{{ db_user }}"
+  become_user: postgres
+
+- name: Import DB dump
+  shell: >
+    psql "{{ db_name }}" "{{ upload_dir }}/{{ instance }}_db.sql"
+  become_user: postgres

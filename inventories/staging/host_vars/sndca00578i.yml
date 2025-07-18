@@ -1,0 +1,8 @@
+ENV_NAME: atlassian-int.mercedes-benz
+REMOTE_HOST: atlassian-int.mercedes-benz.polygran.de
+ansible_host: sndca00578i.polygran.noris.de
+
+app: confluence
+instance: atlassian-int.mercedes-benz
+hostname: atlassian-int.mercedes-benz.polygran.de
+db_name: 

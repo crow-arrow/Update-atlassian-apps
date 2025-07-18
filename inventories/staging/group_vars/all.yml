@@ -1,0 +1,4 @@
+---
+now: "{{ lookup('pipe','date +%Y%m%d') }}"
+snapshot_dir: /var/atlassian/application-data/do_not_delete
+upload_dir: /var/atlassian/application-data/upload

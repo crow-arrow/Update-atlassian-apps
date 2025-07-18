@@ -1,0 +1,3 @@
+# site.yml
+- import_playbook: deploy_jira.yml
+- import_playbook: deploy_confluence.yml

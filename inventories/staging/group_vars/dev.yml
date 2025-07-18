@@ -1,0 +1,3 @@
+env: dev
+now: "{{ lookup('pipe', 'date +%Y%m%d') }}"
+banner_date: "{{ lookup('pipe', 'date +\"%d %b. %Y\"') }}"

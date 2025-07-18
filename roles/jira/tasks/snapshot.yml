@@ -1,0 +1,19 @@
+- name: Create JIRA snapshot
+  shell: >
+    /usr/local/jira/bin/create_snapshot.sh
+    --dest "{{ upload_dir }}/jira_{{ instance }}_{{ ansible_date_time.date }}.tgz"
+  become_user: jira
+
+- name: Cleanup old snapshots
+  find:
+    paths: "{{ upload_dir }}"
+    patterns: "jira_{{ instance }}_*.tgz"
+    age: "{{ snapshot_retention_days }}d"
+    recurse: no
+  register: old_jira_snapshots
+
+- name: Remove old snapshots
+  file:
+    path: "{{ item.path }}"
+    state: absent
+  loop: "{{ old_jira_snapshots.files }}"

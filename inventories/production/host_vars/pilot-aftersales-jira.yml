@@ -1,0 +1,4 @@
+app: jira
+instance: pilot-aftersales
+hostname: pilot-aftersales.mercedes-benz.polygran.de
+db_name: pilot_aftersales_jira

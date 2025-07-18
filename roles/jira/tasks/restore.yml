@@ -1,0 +1,20 @@
+- name: Stop JIRA service
+  service:
+    name: jira
+    state: stopped
+
+- name: Remove existing JIRA installation
+  file:
+    path: "{{ app_base }}/jira/{{ instance }}"
+    state: absent
+
+- name: Restore app and data
+  unarchive:
+    src: "{{ upload_dir }}/jira_{{ instance }}.tgz"
+    dest: "{{ app_base }}/jira/"
+    remote_src: yes
+
+- name: Start JIRA service
+  service:
+    name: jira
+    state: started

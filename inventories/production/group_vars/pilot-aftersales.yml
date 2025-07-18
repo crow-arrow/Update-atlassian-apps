@@ -3,7 +3,7 @@
 ENV_NAME: pilot-aftersales
 JIRA_ENV_NAME: pilot-aftersales
 LOCAL_USER: sascdism
-REMOTE_HOST: mbb-jira.mercedes-benz.polygran.de
+REMOTE_HOST: pilot-aftersales.mercedes-benz.polygran.de
 JIRA_INT_UPLOAD_DIR: /var/atlassian/application-data/upload
 JIRA_INT_ATTACHMENTS_DIR: /var/atlassian/application-data/int/jira/pilot-aftersales/data/attachments
 JIRA_PROD_ATTACHMENTS_DIR: /var/atlassian/application-data/jira/pilot-aftersales/data/attachments

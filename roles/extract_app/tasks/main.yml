@@ -1,43 +1,24 @@
 ---
-- name: Recover data in environment {{ ENV_NAME }}
-  hosts: localhost
-  gather_facts: false
+- name: Backup configs
+  include_tasks: backup_config.yml
+  tags: backup
 
-  tasks:
-    - name: Configuration backups
-      ansible.builtin.copy:
-        remote_src: yes
-        src: "/var/atlassian/application-data/{{ ENV_NAME }}/jira/{{ instance }}/dbconfig.xml"
-        dest: "/var/atlassian/application-data/{{ ENV_NAME }}/jira/{{ instance }}_dbconfig.xml"
-      tags: pre_extract  # Логика из extract_app.sh :contentReference[oaicite:12]{index=12}
+- name: Remove existing app
+  include_tasks: wipe_app.yml
+  tags: wipe
 
-    - name: Unpack DB dump
-      ansible.builtin.command: >
-        pg_restore -h sndcb00581i.polygran.noris.de
-                   -c
-                   --if-exists
-                   -d {{ instance }}_jira_{{ ENV_NAME }}
-                   -U {{ instance }}_jira_user
-                   {{ upload_dir }}/{{ now }}_{{ instance }}.dump
-      tags: extract_db
+- name: Unpack tarballs
+  include_tasks: unpack_app.yml
+  tags: unpack
 
-    - name: Unzip home directory
-      ansible.builtin.unarchive:
-        src: "{{ upload_dir }}/{{ now }}_{{ instance }}_homedir.tgz"
-        dest: "/var/atlassian/application-data/{{ ENV_NAME }}/jira/{{ instance }}/"
-        remote_src: no
-      tags: extract_homedir
+- name: Restore PostgreSQL DB
+  include_tasks: restore_db.yml
+  tags: db
 
-    - name: Unzip the application
-      ansible.builtin.unarchive:
-        src: "{{ upload_dir }}/{{ now }}_{{ instance }}_appdata.tgz"
-        dest: "/opt/atlassian/{{ ENV_NAME }}/jira/{{ instance }}/"
-        remote_src: no
-      tags: extract_appdata
+- name: Apply SQL patches and branding
+  include_tasks: patch_sql.yml
+  tags: patch
 
-    - name: Restore configuration files
-      ansible.builtin.copy:
-        remote_src: yes
-        src: "/var/atlassian/application-data/{{ ENV_NAME }}/jira/{{ instance }}_dbconfig.xml"
-        dest: "/var/atlassian/application-data/{{ ENV_NAME }}/jira/{{ instance }}/dbconfig.xml"
-      tags: post_extract
+- name: Cleanup temporary files
+  include_tasks: finalize.yml
+  tags: cleanup
