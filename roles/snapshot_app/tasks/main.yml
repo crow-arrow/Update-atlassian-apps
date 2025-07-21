@@ -1,36 +1,40 @@
 ---
-- name: Create dumps and archives on a remote host
-  hosts: "{{ target_host }}"
-  gather_facts: false
+- name: Ensure snapshot directory exists
+  file:
+    path: "{{ snapshot_dir }}"
+    state: directory
+    mode: '0755'
 
-  tasks:
-    - name: Take a DB dump
-      ansible.builtin.shell: |
-        pg_dump -h sndcb00582p.polygran.noris.de \
-                -U shared_jira_user \
-                -Fc shared_jira \
-                > {{ snapshot_dir }}/{{ now }}_shared-jira.dump
-      become: yes
-      become_user: postgres
-      tags: snapshot_db  # Логика из snapshot_app.sh :contentReference[oaicite:11]{index=11}
+- name: Create PostgreSQL DB dump (Jira only)
+  shell: >
+    pg_dump -h {{ db_host }} -U {{ db_user }} -Fc {{ db_name }}
+    > {{ snapshot_dir }}/{{ now }}_{{ instance }}.dump
+  become_user: postgres
+  when: app == "jira"
 
-    - name: Pack home directory
-      ansible.builtin.shell: |
-        cd /var/atlassian/application-data/jira
-        find ./data/attachments -maxdepth 1 ! -name 'insight' | tail -n +2 > ./tmp/excl_attachments.txt
-        tar --exclude='./caches/*' \
-            --exclude='./data/backbone-issue-sync/*' \
-            --exclude-from='./tmp/excl_attachments.txt' \
-            -zcvf {{ snapshot_dir }}/{{ now }}_shared-jira_homedir.tgz .
-      become: yes
-      become_user: jira
-      tags: snapshot_homedir
+- name: Create filtered homedir archive
+  shell: >
+    tar --exclude='caches' --exclude='logs' --exclude='tmp' -zcf
+    {{ snapshot_dir }}/{{ now }}_{{ instance }}_homedir.tgz
+    -C {{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }} .
+  become: true
 
-    - name: Pack application
-      ansible.builtin.shell: |
-        cd /opt/atlassian/jira/
-        tar --exclude='./temp/*' --exclude='./logs/*' --exclude='./work/*' \
-            -zcvf {{ snapshot_dir }}/{{ now }}_shared-jira_appdata.tgz .
-      become: yes
-      become_user: jira
-      tags: snapshot_appdata
+- name: Create filtered app archive
+  shell: >
+    tar -zcf {{ snapshot_dir }}/{{ now }}_{{ instance }}_appdata.tgz
+    -C {{ app_base }}/{{ env }}/{{ app }}/{{ instance }} .
+  become: true
+
+- name: Clean old snapshot files
+  find:
+    paths: "{{ snapshot_dir }}"
+    patterns: "{{ instance }}_*"
+    age: "{{ snapshot_retention_days | default(7) }}d"
+    recurse: no
+  register: old_snapshots
+
+- name: Delete old snapshot files
+  file:
+    path: "{{ item.path }}"
+    state: absent
+  loop: "{{ old_snapshots.files }}"

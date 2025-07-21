@@ -1,0 +1,4 @@
+---
+- name: Confluence does not require DB restore step
+  debug:
+    msg: "Skipping DB restore for Confluence: not applicable per snapshot_app.sh logic."

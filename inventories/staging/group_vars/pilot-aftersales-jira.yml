@@ -1,0 +1,5 @@
+app: jira
+instance: pilot-aftersales
+db_name: shared_jira_dev
+db_user: shared_jira_user
+db_host: localhost

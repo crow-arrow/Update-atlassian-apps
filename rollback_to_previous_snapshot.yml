@@ -1,0 +1,40 @@
+---
+- name: Roll back to previous application snapshot on dev/int
+  hosts: dev_int
+  become: true
+  gather_facts: false
+
+  roles:
+    - common
+
+  tasks:
+
+    - name: Stop application service
+      import_role:
+        name: service_control
+      tags: [stop]
+
+    - name: Restore previous config backup
+      import_role:
+        name: backup_restore
+      tags: [restore_config]
+
+    - name: Remove failed deployment
+      import_role:
+        name: cleanup_app
+      tags: [rollback_cleanup]
+
+    - name: Re-deploy previous app/home
+      import_role:
+        name: deploy_backup
+      tags: [rollback_deploy]
+
+    - name: Restore DB from older dump
+      import_role:
+        name: db_restore_backup
+      tags: [rollback_db]
+
+    - name: Start application service
+      import_role:
+        name: service_control
+      tags: [start]

@@ -1,0 +1,14 @@
+---
+- name: Rsync attachments from production to int
+  ansible.builtin.command: >
+    rsync -av --delete
+    {{ REMOTE_HOST }}:{{ PROD_ATTACHMENTS_DIR }}/
+    {{ INT_ATTACHMENTS_DIR }}/
+  become: true
+
+- name: Restore correct file ownership
+  ansible.builtin.file:
+    path: "{{ INT_ATTACHMENTS_DIR }}"
+    owner: "{{ CONFLUENCE_USER | default(LOCAL_USER) }}"
+    recurse: yes
+  become: true

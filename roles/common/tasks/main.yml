@@ -1,3 +1,4 @@
+---
 - name: Ensure snapshot and restore directories exist
   file:
     path: "{{ item }}"
@@ -7,3 +8,14 @@
     mode: 0755
   loop:
     - "{{ upload_dir }}"
+    - "{{ snapshot_dir }}"
+
+# - name: Install required system packages
+  package:
+    name:
+      - tar
+      - rsync
+      - postgresql-client
+      - python3-psycopg2
+    state: present
+  become: true

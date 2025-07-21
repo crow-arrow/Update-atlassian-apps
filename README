@@ -145,6 +145,30 @@ Fertig ✅
 
 ---
 
+## 🚀 Как запустить
+
+1. Инициализируй Vault:
+
+ansible-vault encrypt vault/secrets.yml
+
+2. Запускай:
+
+ansible-playbook playbooks/jira.yml --extra-vars "@vault/secrets.yml" -i inventory/production.yml
+ansible-playbook playbooks/confluence.yml --extra-vars "@vault/secrets.yml" -i 
+
+## 🔄 Как добавить новый сервис
+Создаёшь папку roles/<service_name>/… по шаблону.
+
+Добавляешь hosts: группу (например bitbucket) в inventory/production.yml, group_vars/production.yml и host_vars/….
+
+Пишешь playbooks/<service_name>.yml, подключаешь роли.
+
+Настраиваешь cron‑задачи/расписания в group_vars.
+
+Всё готово!
+
+---
+
 ## 📞 Support
 
 Bei Fragen oder Problemen:

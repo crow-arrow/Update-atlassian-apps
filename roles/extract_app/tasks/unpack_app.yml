@@ -1,18 +1,24 @@
 ---
-- name: Create JIRA app directory
+- name: Create { app } app directory
   file:
-    path: "/opt/atlassian/{{ env }}/jira/{{ jira_item }}"
+    path: "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}"
+    state: directory
+    mode: '0755'
+
+- name: Create {{ app }} home directory
+  file:
+    path: "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}"
     state: directory
     mode: '0755'
 
 - name: Unpack app tarball
   unarchive:
-    src: "/var/atlassian/application-data/upload/{{ now }}_{{ jira_item }}_appdata.tgz"
-    dest: "/opt/atlassian/{{ env }}/jira/{{ jira_item }}"
+    src: "{{ upload_dir }}/{{ now }}_{{ instance }}_appdata.tgz"
+    dest: "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}"
     remote_src: yes
 
 - name: Unpack home dir tarball
   unarchive:
-    src: "/var/atlassian/application-data/upload/{{ now }}_{{ jira_item }}_homedir.tgz"
-    dest: "/var/atlassian/application-data/{{ env }}/jira/{{ jira_item }}"
+    src: "{{ upload_dir }}/{{ now }}_{{ instance }}_homedir.tgz"
+    dest: "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}"
     remote_src: yes

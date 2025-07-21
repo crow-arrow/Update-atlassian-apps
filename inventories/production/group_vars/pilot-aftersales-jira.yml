@@ -1,0 +1,8 @@
+---
+# из jira.env :contentReference[oaicite:9]{index=9}
+app: jira
+instance: pilot-aftersales
+db_name: shared_jira
+db_user: shared_jira_user
+# db_host: sndcb00582p.polygran.noris.de
+LOCAL_USER: sascdism

@@ -1,0 +1,19 @@
+- name: Set backup timestamp
+  set_fact:
+    backup_timestamp: "{{ ansible_date_time.iso8601 }}"
+
+- name: Ensure backup directory exists
+  file:
+    path: "/tmp/{{ app }}_backup/{{ instance }}/{{ backup_timestamp }}"
+    state: directory
+    mode: '0755'
+
+- name: Backup dbconfig.xml
+  copy:
+    src: "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}/dbconfig.xml"
+    dest: "/tmp/{{ app }}_backup/{{ instance }}/{{ backup_timestamp }}/dbconfig.xml"
+
+- name: Backup server.xml
+  copy:
+    src: "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}/conf/server.xml"
+    dest: "/tmp/{{ app }}_backup/{{ instance }}/{{ backup_timestamp }}/server.xml"

@@ -1,0 +1,5 @@
+app: confluence
+instance: pilot-aftersales-confluence
+db_name: shared_confluence_dev
+db_user: shared_confluence_user
+db_host: localhost

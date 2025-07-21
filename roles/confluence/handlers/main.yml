@@ -1,4 +1,0 @@
-- name: restart confluence service
-  service:
-    name: confluence
-    state: restarted

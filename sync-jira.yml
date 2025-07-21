@@ -1,6 +1,0 @@
-- name: Manage JIRA instances
-  hosts: jira
-  become: true
-  roles:
-    - { role: common }
-    - role: jira

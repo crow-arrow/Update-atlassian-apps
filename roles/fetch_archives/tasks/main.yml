@@ -1,0 +1,28 @@
+---
+- name: Fetch archives from production to AWX controller
+  hosts: production
+  become: true
+  gather_facts: false
+
+  vars:
+    now: "{{ lookup('pipe', 'date +%Y%m%d') }}"
+
+  tasks:
+    - name: Get app archive
+      fetch:
+        src: "{{ snapshot_dir }}/{{ now }}_{{ instance }}_appdata.tgz"
+        dest: "{{ upload_dir }}/"
+        flat: yes
+
+    - name: Get home archive
+      fetch:
+        src: "{{ snapshot_dir }}/{{ now }}_{{ instance }}_homedir.tgz"
+        dest: "{{ upload_dir }}/"
+        flat: yes
+
+    - name: Get DB dump (Jira only)
+      fetch:
+        src: "{{ snapshot_dir }}/{{ now }}_{{ instance }}.dump"
+        dest: "{{ upload_dir }}/"
+        flat: yes
+      when: app == "jira"

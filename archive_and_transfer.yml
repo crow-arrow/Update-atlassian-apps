@@ -1,0 +1,27 @@
+---
+- name: Archive and transfer app snapshots from production
+  hosts: production
+  become: true
+  gather_facts: false
+
+  roles:
+    - common  # создание upload_dir, snapshot_dir, установка нужных пакетов
+
+  tasks:
+
+    - name: Create application snapshot (Jira only)
+      import_role:
+        name: snapshot_app
+      when: app == "jira"
+      tags: [snapshot]
+
+    - name: Create application snapshot (Confluence only)
+      import_role:
+        name: confluence_snapshot
+      when: app == "confluence"
+      tags: [snapshot]
+
+    - name: Fetch archives to control node
+      import_role:
+        name: fetch_archives
+      tags: [fetch]

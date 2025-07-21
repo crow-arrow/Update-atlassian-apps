@@ -1,0 +1,13 @@
+---
+- name: Ensure database exists for Jira
+  postgresql_db:
+    name: "{{ db_name }}"
+    state: present
+    owner: "{{ db_user }}"
+  become_user: postgres
+
+- name: Restore Jira DB from dump
+  shell: >
+    pg_restore -c --if-exists -d {{ db_name }} -U {{ db_user }}
+    {{ upload_dir }}/{{ now }}_{{ instance }}.dump
+  become_user: postgres

@@ -1,0 +1,49 @@
+---
+- name: Set JIRA base URL
+  postgresql_query:
+    db: "{{ db_name }}"
+    login_user: "{{ db_user }}"
+    query: |
+      UPDATE propertystring
+      SET propertyvalue = 'https://atlassian-int.mercedes-benz.polygran.de/{{ env }}-{{ jira_item }}'
+      FROM propertyentry PE
+      WHERE PE.id = propertystring.id
+        AND PE.property_key = 'jira.baseurl'
+
+- name: Render HTML banner
+  template:
+    src: banner.html.j2
+    dest: "/tmp/banner_{{ jira_item }}.html"
+
+- name: Set alertheader banner
+  shell: |
+    echo "UPDATE propertytext
+    SET propertyvalue = '$(cat /tmp/banner_{{ jira_item }}.html)'
+    WHERE ID = (SELECT id FROM propertyentry WHERE property_key='jira.alertheader');" \
+    | psql -U {{ db_user }} -d {{ db_name }}
+  become_user: postgres
+
+- name: Set alertheader visibility
+  postgresql_query:
+    db: "{{ db_name }}"
+    login_user: "{{ db_user }}"
+    query: |
+      UPDATE propertystring
+      SET propertyvalue = 'public'
+      WHERE ID = (SELECT id FROM propertyentry WHERE property_key='jira.alertheader.visibility')
+
+- name: Update embedded app reference to confluence
+  postgresql_query:
+    db: "{{ db_name }}"
+    login_user: "{{ db_user }}"
+    query: |
+      UPDATE propertystring
+      SET propertyvalue = 'https://atlassian-int.mercedes-benz.polygran.de/{{ env }}-pilot-aftersales-confluence'
+      WHERE id = ANY (
+        SELECT PS.id
+        FROM propertystring AS PS
+        INNER JOIN propertyentry AS PE
+          ON PS.id = PE.id
+        WHERE PS.propertyvalue LIKE '%pilot-aftersales-confluence.mercedes-benz.polygran.de%'
+          AND PE.property_key LIKE '%app%'
+      )

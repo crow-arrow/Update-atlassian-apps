@@ -1,0 +1,10 @@
+---
+- name: Remove {{ app }} app directory
+  file:
+    path: "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}"
+    state: absent
+
+- name: Remove {{ app }} home directory
+  file:
+    path: "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}"
+    state: absent

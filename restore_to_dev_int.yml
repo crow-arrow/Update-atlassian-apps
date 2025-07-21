@@ -1,0 +1,64 @@
+---
+- name: Restore app to dev/int environment
+  hosts: staging
+  become: true
+  gather_facts: false
+
+  roles:
+    - common  # базовые пути, пакеты
+
+  tasks:
+
+    - name: Stop application service
+      import_role:
+        name: service_control
+      tags: [stop]
+
+    - name: Push archives to target host
+      import_role:
+        name: push_archives
+      tags: [push]
+
+    - name: Backup current config before deployment
+      import_role:
+        name: backup_config
+      tags: [backup]
+
+    - name: Clean up previous instance files
+      import_role:
+        name: cleanup_app
+      tags: [cleanup]
+
+    - name: Deploy new version from archives
+      import_role:
+        name: deploy_app
+      tags: [deploy]
+
+    - name: Restore database (Jira only)
+      import_role:
+        name: db_restore
+      when: app == "jira"
+      tags: [restore]
+
+    - name: Restore database (Confluence only)
+      import_role:
+        name: db_restore
+      when: app == "confluence"
+      tags: [restore]
+
+    - name: Configure JIRA-specific environment (baseurl, banner, confluence links)
+      import_role:
+        name: configure_jira_instance
+      when: app == "jira"
+      tags: [configure]
+
+    - name: Sync Confluence attachments
+      import_role:
+        name: sync_attachments
+      when: app == "confluence" and INCLUDE_ATTACHMENTS | default(false)
+      tags: [attachments]
+
+    - name: Start application service
+      import_role:
+        name: service_control
+      tags: [start]

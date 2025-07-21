@@ -1,0 +1,14 @@
+---
+- name: Stop service
+  ansible.builtin.service:
+    name: "{{ ENV_NAME }}"
+    state: stopped
+  become: true
+  tags: stop
+
+- name: Start service
+  ansible.builtin.service:
+    name: "{{ ENV_NAME }}"
+    state: started
+  become: true
+  tags: start
