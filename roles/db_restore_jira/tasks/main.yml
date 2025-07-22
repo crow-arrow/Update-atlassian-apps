@@ -1,13 +1,12 @@
 ---
-- name: Ensure database exists for Jira
-  postgresql_db:
-    name: "{{ db_name }}"
-    state: present
-    owner: "{{ db_user }}"
-  become_user: postgres
-
-- name: Restore Jira DB from dump
-  shell: >
-    pg_restore -c --if-exists -d {{ db_name }} -U {{ db_user }}
-    {{ upload_dir }}/{{ now }}_{{ instance }}.dump
-  become_user: postgres
+- name: Restore PostgreSQL DB from dump (app-user only, no sudo)
+  shell: |
+    PGPASSWORD="{{ db_pass }}" \
+    pg_restore -U {{ db_user }} -h {{ db_host }} -p {{ db_port | default(5432) }} \
+      -c --if-exists -d {{ db_name }} {{ upload_dir }}/{{ now }}_{{ instance }}.dump
+  args:
+    executable: /bin/bash
+  register: restore_result
+  changed_when: "'restoring data' in restore_result.stdout or 'processing data' in restore_result.stdout"
+  failed_when: restore_result.rc != 0
+  tags: restore

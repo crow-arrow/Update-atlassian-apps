@@ -10,7 +10,7 @@
     - "{{ upload_dir }}"
     - "{{ snapshot_dir }}"
 
-# - name: Install required system packages
+- name: Install required system packages
   package:
     name:
       - tar

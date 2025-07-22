@@ -1,11 +1,14 @@
 ---
-- name: Set JIRA base URL
+- name: Update jira.baseurl in DB
   postgresql_query:
     db: "{{ db_name }}"
     login_user: "{{ db_user }}"
+    login_password: "{{ db_pass }}"
+    login_host: "{{ db_host }}"
+    login_port: "{{ db_port | default(5432) }}"
     query: |
       UPDATE propertystring
-      SET propertyvalue = 'https://atlassian-int.mercedes-benz.polygran.de/{{ env }}-{{ jira_item }}'
+      SET propertyvalue = 'https://{{ ansible_host }}/{{ env }}-{{ instance }}'
       FROM propertyentry PE
       WHERE PE.id = propertystring.id
         AND PE.property_key = 'jira.baseurl'
@@ -13,37 +16,44 @@
 - name: Render HTML banner
   template:
     src: banner.html.j2
-    dest: "/tmp/banner_{{ jira_item }}.html"
+    dest: "/tmp/banner_{{ instance }}.html"
 
 - name: Set alertheader banner
   shell: |
-    echo "UPDATE propertytext
-    SET propertyvalue = '$(cat /tmp/banner_{{ jira_item }}.html)'
-    WHERE ID = (SELECT id FROM propertyentry WHERE property_key='jira.alertheader');" \
-    | psql -U {{ db_user }} -d {{ db_name }}
-  become_user: postgres
+    cat "/tmp/banner_{{ instance }}.html" | PGPASSWORD="{{ db_pass }}" psql \
+      -U {{ db_user }} -h {{ db_host }} -p {{ db_port | default(5432) }} \
+      -d {{ db_name }} -c \
+      "UPDATE propertytext
+       SET propertyvalue = $$$(< /dev/stdin)$$$
+       WHERE id = (SELECT id FROM propertyentry WHERE property_key='jira.alertheader');"
+  args:
+    executable: /bin/bash
 
 - name: Set alertheader visibility
   postgresql_query:
     db: "{{ db_name }}"
     login_user: "{{ db_user }}"
+    login_password: "{{ db_pass }}"
+    login_host: "{{ db_host }}"
+    login_port: "{{ db_port | default(5432) }}"
     query: |
       UPDATE propertystring
       SET propertyvalue = 'public'
-      WHERE ID = (SELECT id FROM propertyentry WHERE property_key='jira.alertheader.visibility')
+      WHERE id = (SELECT id FROM propertyentry WHERE property_key='jira.alertheader.visibility')
 
-- name: Update embedded app reference to confluence
+- name: Update embedded Confluence links
   postgresql_query:
     db: "{{ db_name }}"
     login_user: "{{ db_user }}"
+    login_password: "{{ db_pass }}"
+    login_host: "{{ db_host }}"
+    login_port: "{{ db_port | default(5432) }}"
     query: |
       UPDATE propertystring
-      SET propertyvalue = 'https://atlassian-int.mercedes-benz.polygran.de/{{ env }}-pilot-aftersales-confluence'
+      SET propertyvalue = 'https://{{ ansible_host }}/{{ env }}-pilot-aftersales-confluence'
       WHERE id = ANY (
-        SELECT PS.id
-        FROM propertystring AS PS
-        INNER JOIN propertyentry AS PE
-          ON PS.id = PE.id
-        WHERE PS.propertyvalue LIKE '%pilot-aftersales-confluence.mercedes-benz.polygran.de%'
+        SELECT PS.id FROM propertystring PS
+        JOIN propertyentry PE ON PS.id = PE.id
+        WHERE PS.propertyvalue LIKE '%pilot-aftersales-confluence%'
           AND PE.property_key LIKE '%app%'
       )

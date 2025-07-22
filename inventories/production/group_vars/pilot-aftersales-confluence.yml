@@ -1,5 +1,7 @@
-app: confluence
-instance: pilot-aftersales-confluence
-db_name: shared_confluence
-db_user: shared_confluence_user
-# db_host: sndcb00583p.polygran.noris.de
+---
+ENV_USER: confluence
+db_name: gspopl_confluence
+db_user: gspopl_confluence_user
+db_pass: "{{ vault_gspopl_confluence_password }}"
+db_host: sndcb00582p.polygran.noris.de
+db_port: 5432

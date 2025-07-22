@@ -4,6 +4,15 @@
   become: true
   gather_facts: false
 
+  vars:
+    rollback_snapshot_date: "{{ rollback_snapshot_date | default('') }}"
+
+  pre_tasks:
+    - name: Ensure rollback_snapshot_date is provided
+      assert:
+        that: rollback_snapshot_date | length > 0
+        fail_msg: "❗ rollback_snapshot_date is required! Please specify it via extra-vars or prompt."
+
   roles:
     - common
 
@@ -24,14 +33,21 @@
         name: cleanup_app
       tags: [rollback_cleanup]
 
-    - name: Re-deploy previous app/home
+    - name: Re-deploy previous app/home from backup
       import_role:
         name: deploy_backup
       tags: [rollback_deploy]
 
-    - name: Restore DB from older dump
+    - name: Restore Jira DB from older dump
       import_role:
-        name: db_restore_backup
+        name: db_restore_jira_backup
+      when: app == "jira"
+      tags: [rollback_db]
+
+    - name: Restore Confluence DB from older dump
+      import_role:
+        name: db_restore_confluence_backup
+      when: app == "confluence"
       tags: [rollback_db]
 
     - name: Start application service

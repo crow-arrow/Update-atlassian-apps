@@ -1,8 +1,14 @@
 env: production
 
+LOCAL_USER: sascdism
 now: "{{ lookup('pipe','date +%Y%m%d') }}"
+
 app_base: /opt/atlassian
 app_data_base: /var/atlassian/application-data
+
 upload_dir: /var/atlassian/application-data/upload
 snapshot_dir: /var/atlassian/application-data/do_not_delete
+
 snapshot_retention_days: 7
+
+INCLUDE_ATTACHMENTS: false

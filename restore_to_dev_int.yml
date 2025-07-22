@@ -1,8 +1,11 @@
 ---
 - name: Restore app to dev/int environment
   hosts: staging
-  become: true
+  become: false
   gather_facts: false
+
+  vars:
+    now: "{{ ansible_date_time.date }}"
 
   roles:
     - common  # базовые пути, пакеты
@@ -36,13 +39,13 @@
 
     - name: Restore database (Jira only)
       import_role:
-        name: db_restore
+        name: db_restore_jira
       when: app == "jira"
       tags: [restore]
 
     - name: Restore database (Confluence only)
       import_role:
-        name: db_restore
+        name: db_restore_confluence
       when: app == "confluence"
       tags: [restore]
 

@@ -1,8 +1,7 @@
 ---
-# из jira.env :contentReference[oaicite:9]{index=9}
-app: jira
-instance: pilot-aftersales
-db_name: shared_jira
-db_user: shared_jira_user
-# db_host: sndcb00582p.polygran.noris.de
-LOCAL_USER: sascdism
+ENV_USER: jira
+db_name: gspopl_jira
+db_user: gspopl_jira_user
+db_pass: "{{ vault_gspopl_jira_password }}"
+db_host: sndcb00582p.polygran.noris.de
+db_port: 5432

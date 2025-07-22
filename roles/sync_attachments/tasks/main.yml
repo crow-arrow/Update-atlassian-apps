@@ -9,6 +9,6 @@
 - name: Restore correct file ownership
   ansible.builtin.file:
     path: "{{ INT_ATTACHMENTS_DIR }}"
-    owner: "{{ CONFLUENCE_USER | default(LOCAL_USER) }}"
+    owner: "{{ ENV_USER }}"
     recurse: yes
   become: true
