@@ -1,16 +1,18 @@
 ---
-- name: Ensure snapshot and restore directories exist
-  file:
+- name: Ensure snapshot and upload directories exist
+  ansible.builtin.file:
     path: "{{ item }}"
     state: directory
     owner: root
     group: root
-    mode: 0755
+    mode: '0755'
   loop:
     - "{{ upload_dir }}"
     - "{{ snapshot_dir }}"
+  loop_control:
+    label: "{{ item }}"
 
-- name: Install required system packages
+# - name: Install required system packages
   package:
     name:
       - tar

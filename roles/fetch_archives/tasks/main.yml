@@ -1,27 +1,51 @@
 ---
-- name: Fetch archives from production to AWX controller
-  hosts: production
-  become: true
-  gather_facts: false
+- name: Set timestamp fact
+  ansible.builtin.set_fact:
+    now: "{{ ansible_date_time.date | regex_replace('-', '') }}"
 
-  vars:
-    now: "{{ lookup('pipe', 'date +%Y%m%d') }}"
+- name: Ensure upload directory exists on AWX controller
+  ansible.builtin.file:
+    path: "{{ upload_dir }}"
+    state: directory
+    mode: '0755'
+  delegate_to: localhost
+  run_once: true
 
-  tasks:
-    - name: Get app archive
-      fetch:
-        src: "{{ snapshot_dir }}/{{ now }}_{{ instance }}_appdata.tgz"
-        dest: "{{ upload_dir }}/"
-        flat: yes
+- name: Stat appdata archive
+  ansible.builtin.stat:
+    path: "{{ snapshot_dir }}/{{ now }}_{{ instance }}_appdata.tgz"
+  register: stat_app
 
-    - name: Get home archive
-      fetch:
-        src: "{{ snapshot_dir }}/{{ now }}_{{ instance }}_homedir.tgz"
-        dest: "{{ upload_dir }}/"
-        flat: yes
+- name: Fetch appdata archive
+  ansible.builtin.fetch:
+    src:  "{{ snapshot_dir }}/{{ now }}_{{ instance }}_appdata.tgz"
+    dest: "{{ upload_dir }}/"
+    flat: yes
+    force: no
+  when: stat_app.stat.exists
 
-    - name: Get DB dump
-      fetch:
-        src: "{{ snapshot_dir }}/{{ now }}_{{ instance }}.dump"
-        dest: "{{ upload_dir }}/"
-        flat: yes
+- name: Stat homedir archive
+  ansible.builtin.stat:
+    path: "{{ snapshot_dir }}/{{ now }}_{{ instance }}_homedir.tgz"
+  register: stat_home
+
+- name: Fetch homedir archive
+  ansible.builtin.fetch:
+    src:  "{{ snapshot_dir }}/{{ now }}_{{ instance }}_homedir.tgz"
+    dest: "{{ upload_dir }}/"
+    flat: yes
+    force: no
+  when: stat_home.stat.exists
+
+- name: Stat DB dump
+  ansible.builtin.stat:
+    path: "{{ snapshot_dir }}/{{ now }}_{{ instance }}.dump"
+  register: stat_db
+
+- name: Fetch DB dump
+  ansible.builtin.fetch:
+    src:  "{{ snapshot_dir }}/{{ now }}_{{ instance }}.dump"
+    dest: "{{ upload_dir }}/"
+    flat: yes
+    force: no
+  when: stat_db.stat.exists

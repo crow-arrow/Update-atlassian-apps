@@ -5,7 +5,7 @@
   gather_facts: false
 
   roles:
-    - common  # создание upload_dir, snapshot_dir, установка нужных пакетов
+    - common
 
   tasks:
 
@@ -15,7 +15,7 @@
       when: app == "jira"
       tags: [snapshot]
 
-    - name: Fetch archives to control node
+    - name: Fetch archives to AWX controller
       import_role:
         name: fetch_archives
       tags: [fetch]
