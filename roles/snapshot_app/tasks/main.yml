@@ -1,40 +1,118 @@
 ---
 - name: Ensure snapshot directory exists
-  file:
+  ansible.builtin.file:
     path: "{{ snapshot_dir }}"
     state: directory
     mode: '0755'
 
-- name: Create PostgreSQL DB dump (Jira only)
-  shell: >
-    pg_dump -h {{ db_host }} -U {{ db_user }} -Fc {{ db_name }}
-    > {{ snapshot_dir }}/{{ now }}_{{ instance }}.dump
+- name: Set timestamp fact
+  ansible.builtin.set_fact:
+    now: "{{ ansible_date_time.date | regex_replace('-', '') }}"
+
+- name: Dump PostgreSQL database
+  community.postgresql.postgresql_db:
+    state: dump
+    target: "{{ snapshot_dir }}/{{ now }}_{{ instance }}.dump"
+    login_host: "{{ db_host }}"
+    login_user: "{{ db_user }}"
+    db: "{{ db_name }}"
   become_user: postgres
-  when: app == "jira"
+
+- name: Find first-level attachment subdirs (excluding 'insight')
+  ansible.builtin.find:
+    paths: "{{ application_data_home }}/data/attachments"
+    file_type: directory
+    recurse: no
+    patterns: '*'
+    excludes: insight
+  register: attachment_dirs
+  ignore_errors: true
+
+- name: Write exclude-from file for attachments
+  ansible.builtin.copy:
+    dest: "{{ snapshot_dir }}/excl_attachments.txt"
+    content: |
+      {% for dir in attachment_dirs.files[1:] %}
+      data/attachments/{{ dir.path | basename }}/*
+      {% endfor %}
+  when: attachment_dirs.files is defined and attachment_dirs.files | length > 1
 
 - name: Create filtered homedir archive
-  shell: >
-    tar --exclude='caches' --exclude='logs' --exclude='tmp' -zcf
-    {{ snapshot_dir }}/{{ now }}_{{ instance }}_homedir.tgz
-    -C {{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }} .
+  ansible.builtin.shell: |
+    tar \
+      --exclude='./caches/*' \
+      --exclude='./data/backbone-issue-sync/*' \
+      --exclude='./data/git-plugin/*' \
+      --exclude='./eazybi.toml' \
+      --exclude='./export/*' \
+      --exclude='./import/*' \
+      --exclude='./log/*' \
+      --exclude='./tmp/*' \
+      {% if attachment_dirs.files|length > 1 %}
+      --exclude-from='{{ snapshot_dir }}/excl_attachments.txt' \
+      {% endif %}
+      -zcvf '{{ snapshot_dir }}/{{ now }}_{{ instance }}_homedir.tgz' .
+  args:
+    chdir: "{{ application_data_home }}"
   become: true
 
-- name: Create filtered app archive
-  shell: >
-    tar -zcf {{ snapshot_dir }}/{{ now }}_{{ instance }}_appdata.tgz
-    -C {{ app_base }}/{{ env }}/{{ app }}/{{ instance }} .
+- name: Remove temporary exclude-from file
+  ansible.builtin.file:
+    path: "{{ snapshot_dir }}/excl_attachments.txt"
+    state: absent
+  when:
+    - attachment_dirs is defined
+    - attachment_dirs.files | length > 1
+
+- name: Set permissions on attachment directories
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    mode: '0750'
+  loop: "{{ lookup('ansible.builtin.find',
+                   paths=application_data_home + '/data/attachments',
+                   file_type='directory',
+                   recurse=True).files }}"
+  when: lookup('ansible.builtin.stat', application_data_home + '/data/attachments').stat.exists
+  loop_control:
+    label: "{{ item.path }}"
   become: true
 
-- name: Clean old snapshot files
-  find:
+- name: Set permissions on attachment files
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    mode: '0640'
+  loop: "{{ lookup('ansible.builtin.find',
+                   paths=application_data_home + '/data/attachments',
+                   file_type='file',
+                   recurse=True).files }}"
+  when: lookup('ansible.builtin.stat', application_data_home + '/data/attachments').stat.exists
+  loop_control:
+    label: "{{ item.path }}"
+  become: true
+
+- name: Create filtered appdata archive
+  ansible.builtin.shell: |
+    tar \
+      --exclude='./temp/*' \
+      --exclude='./logs/*' \
+      --exclude='./work/*' \
+      -zcvf '{{ snapshot_dir }}/{{ now }}_{{ instance }}_appdata.tgz' .
+  args:
+    chdir: "{{ application_install_dir }}"
+  become: true
+
+- name: Find old snapshots
+  ansible.builtin.find:
     paths: "{{ snapshot_dir }}"
     patterns: "{{ instance }}_*"
-    age: "{{ snapshot_retention_days | default(7) }}d"
+    age: "{{ snapshot_retention_days }}d"
     recurse: no
   register: old_snapshots
 
-- name: Delete old snapshot files
-  file:
+- name: Remove old snapshots
+  ansible.builtin.file:
     path: "{{ item.path }}"
     state: absent
   loop: "{{ old_snapshots.files }}"
+  when: old_snapshots.matched > 0
+  

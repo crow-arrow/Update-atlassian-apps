@@ -3,5 +3,4 @@ ansible_host: sndca00572p.polygran.noris.de
 app: jira
 instance: pilot-aftersales
 
-ENV_NAME: atlassian-jira.service
 REMOTE_HOST: sndca00572p.polygran.noris.de

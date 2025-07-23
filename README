@@ -106,7 +106,7 @@ int-hostname ansible_user=remoteuser
 ## Beispiel: Inhalt von `group_vars/all.yml`
 
 ```yaml
-ENV_NAME: "online-help"
+SERVICE_NAME: "online-help"
 CONFLUENCE_USER: "confluence"
 LOCAL_USER: "sascdism"
 REMOTE_HOST: "online-help.merceds-benz.polygran.de"
@@ -118,7 +118,7 @@ EXTRACT_SCRIPT: "/home/confluence/extract_app.sh"
 AUTO_CONFIRM: true
 INCLUDE_ATTACHMENTS: true
 INCLUDE_JIRA_ATTACHMENTS: true
-JIRA_ENV_NAME: "jira"
+JIRA_SERVICE_NAME: "jira"
 JIRA_PROD_ATTACHMENTS_DIR: "/var/atlassian/application-data/jira/data"
 JIRA_INT_UPLOAD_DIR: "/var/atlassian/application-data/upload"
 JIRA_INT_ATTACHMENTS_DIR: "/var/atlassian/application-data/jira/data/attachments"

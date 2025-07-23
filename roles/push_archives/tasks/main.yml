@@ -1,6 +1,7 @@
 ---
 - name: Push archives to dev/int host from AWX controller
-  hosts: staging
+  hosts: dev
+    when: env = dev
   become: true
   gather_facts: false
 

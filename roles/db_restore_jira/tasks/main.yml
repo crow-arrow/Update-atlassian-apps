@@ -1,7 +1,7 @@
 ---
 - name: Restore PostgreSQL DB from dump (app-user only, no sudo)
   shell: |
-    PGPASSWORD="{{ db_pass }}" \
+    export PGPASSWORD="{{ db_pass }}" \
     pg_restore -U {{ db_user }} -h {{ db_host }} -p {{ db_port | default(5432) }} \
       -c --if-exists -d {{ db_name }} {{ upload_dir }}/{{ now }}_{{ instance }}.dump
   args:

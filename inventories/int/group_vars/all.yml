@@ -1,4 +1,10 @@
 now: "{{ lookup('pipe','date +%Y%m%d') }}"
+
+env: int
+
+INT_ATTACHMENTS_DIR: "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}/attachments"
+PROD_ATTACHMENTS_DIR: /var/atlassian/application-data/{{ app }}/attachments
+
 app_base: /opt/atlassian
 app_data_base: /var/atlassian/application-data
 upload_dir: /var/atlassian/application-data/upload

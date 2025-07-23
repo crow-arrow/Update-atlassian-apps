@@ -20,9 +20,8 @@
         dest: "{{ upload_dir }}/"
         flat: yes
 
-    - name: Get DB dump (Jira only)
+    - name: Get DB dump
       fetch:
         src: "{{ snapshot_dir }}/{{ now }}_{{ instance }}.dump"
         dest: "{{ upload_dir }}/"
         flat: yes
-      when: app == "jira"

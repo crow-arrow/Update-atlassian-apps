@@ -2,4 +2,5 @@ app: jira
 instance: pilot-aftersales
 db_name: shared_jira_dev
 db_user: shared_jira_user
-db_host: localhost
+db_host: sndcb00582p.polygran.noris.de
+SERVICE_NAME: pilot-aftersales.service

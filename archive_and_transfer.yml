@@ -9,16 +9,10 @@
 
   tasks:
 
-    - name: Create application snapshot (Jira only)
+    - name: Create application snapshot
       import_role:
         name: snapshot_app
       when: app == "jira"
-      tags: [snapshot]
-
-    - name: Create application snapshot (Confluence only)
-      import_role:
-        name: confluence_snapshot
-      when: app == "confluence"
       tags: [snapshot]
 
     - name: Fetch archives to control node

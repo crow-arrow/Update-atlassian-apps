@@ -1,0 +1,7 @@
+app: confluence
+instance: pilot-aftersales-confluence
+db_name: shared_confluence_dev
+db_user: shared_confluence_user
+db_host: sndcb00582p.polygran.noris.de
+SERVICE_NAME: pilot-aftersales-confluence.service
+
