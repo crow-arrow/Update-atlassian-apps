@@ -1,6 +1,6 @@
 ---
 - name: Archive and transfer app snapshots from production
-  hosts: "{{ app }}"
+  hosts: localhost
   become: true
   gather_facts: false
 
@@ -8,6 +8,15 @@
     - common
 
   tasks:
+
+    - name: Show inventory graph
+      ansible.builtin.command:
+        cmd: ansible-inventory --graph -i /runner/inventory/hosts
+      register: inv
+
+    - name: Dump groups
+      ansible.builtin.debug:
+        var: inv.stdout_lines
 
     - name: Create application snapshot
       import_role:
