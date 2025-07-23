@@ -1,9 +1,15 @@
 ---
+- name: Update APT cache
+  ansible.builtin.apt:
+    update_cache: yes
+    cache_valid_time: 3600
+
 - name: Install required packages  
   ansible.builtin.package:
     name:
       - tar
       - postgresql-client
+      - python3-psycopg2 
     state: present
 
 - name: Ensure snapshot and upload directories exist  

@@ -9,7 +9,7 @@
   ansible.builtin.set_fact:
     now: "{{ ansible_date_time.date | regex_replace('-', '') }}"
 
-- name: Dump PostgreSQL database
+- name: Dump PostgreSQL database via module
   community.postgresql.postgresql_db:
     state: dump
     target: "{{ snapshot_dir }}/{{ now }}_{{ instance }}.dump"
