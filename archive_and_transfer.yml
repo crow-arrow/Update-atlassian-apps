@@ -1,6 +1,6 @@
 ---
 - name: Archive and transfer app snapshots from production
-  hosts: production
+  hosts: "{{ app }}"
   become: true
   gather_facts: false
 
