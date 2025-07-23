@@ -1,5 +1,12 @@
 ---
-- name: Ensure snapshot and upload directories exist
+- name: Install required packages  
+  ansible.builtin.package:
+    name:
+      - tar
+      - postgresql-client
+    state: present
+
+- name: Ensure snapshot and upload directories exist  
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
@@ -11,13 +18,3 @@
     - "{{ snapshot_dir }}"
   loop_control:
     label: "{{ item }}"
-
-# - name: Install required system packages
-  package:
-    name:
-      - tar
-      - rsync
-      - postgresql-client
-      - python3-psycopg2
-    state: present
-  become: true
