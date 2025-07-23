@@ -1,6 +1,31 @@
 ---
-- name: Archive and transfer app snapshots from production
+# 1. Debug динамического инвентория AWX
+- name: Debug AWX dynamic inventory
   hosts: localhost
+  gather_facts: false
+  become: false
+  tasks:
+    - name: Show inventory graph
+      ansible.builtin.command:
+        cmd: ansible-inventory --graph -i /runner/inventory/hosts
+      register: inv_graph
+
+    - name: Display group graph
+      ansible.builtin.debug:
+        var: inv_graph.stdout_lines
+
+    - name: Dump inventory JSON
+      ansible.builtin.command:
+        cmd: ansible-inventory --list -i /runner/inventory/hosts
+      register: inv_raw
+
+    - name: Display raw inventory data
+      ansible.builtin.debug:
+        var: inv_raw.stdout_lines
+
+# 2. Основной play: бэкап и сбор архивов
+- name: Archive and transfer app snapshots from production
+  hosts: "{{ app }}"
   become: true
   gather_facts: false
 
@@ -8,15 +33,6 @@
     - common
 
   tasks:
-
-    - name: Show inventory graph
-      ansible.builtin.command:
-        cmd: ansible-inventory --graph -i /runner/inventory/hosts
-      register: inv
-
-    - name: Dump groups
-      ansible.builtin.debug:
-        var: inv.stdout_lines
 
     - name: Create application snapshot
       import_role:
