@@ -4,6 +4,8 @@
   hosts: localhost
   gather_facts: false
   become: false
+  become_method: sudo
+  become_flags: '-n'
   tasks:
     - name: Show inventory graph
       ansible.builtin.command:
