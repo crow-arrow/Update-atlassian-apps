@@ -2,7 +2,7 @@
 - name: Archive and transfer app snapshots from production
   hosts: "{{ app }}"
   become: false
-  gather_facts: false
+  gather_facts: true
 
   roles:
     - common
@@ -12,7 +12,6 @@
     - name: Create application snapshot
       import_role:
         name: snapshot_app
-      when: app == "jira"
       tags: [snapshot]
 
     - name: Fetch archives to AWX controller
