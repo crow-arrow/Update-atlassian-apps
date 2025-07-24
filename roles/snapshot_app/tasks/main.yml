@@ -15,8 +15,9 @@
     target: "{{ snapshot_dir }}/{{ now }}_{{ instance }}.dump"
     login_host: "{{ db_host }}"
     login_user: "{{ db_user }}"
+    login_password: "{{ db_password }}"
     db: "{{ db_name }}"
-  become_user: postgres
+  become: false
 
 - name: Find first-level attachment subdirs (excluding 'insight')
   ansible.builtin.find:

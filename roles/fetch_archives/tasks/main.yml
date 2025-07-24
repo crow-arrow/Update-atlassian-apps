@@ -19,7 +19,7 @@
 - name: Fetch appdata archive
   ansible.builtin.fetch:
     src:  "{{ snapshot_dir }}/{{ now }}_{{ instance }}_appdata.tgz"
-    dest: "{{ upload_dir }}/"
+    dest: "{{ upload_dir }}/{{ inventory_hostname }}/"
     flat: yes
     force: no
   when: stat_app.stat.exists
@@ -45,7 +45,7 @@
 - name: Fetch DB dump
   ansible.builtin.fetch:
     src:  "{{ snapshot_dir }}/{{ now }}_{{ instance }}.dump"
-    dest: "{{ upload_dir }}/"
+    dest: "{{ upload_dir }}/{{ inventory_hostname }}/"
     flat: yes
     force: no
   when: stat_db.stat.exists

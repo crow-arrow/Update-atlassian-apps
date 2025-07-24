@@ -1,11 +1,11 @@
 ---
 - name: Archive and transfer app snapshots from production
   hosts: "{{ app }}"
-  become: true
+  become: false
   gather_facts: false
 
-  # roles:
-  #   - common
+  roles:
+    - common
 
   tasks:
 
