@@ -15,7 +15,9 @@
     target: "{{ snapshot_dir }}/{{ now }}_{{ instance }}.dump"
     login_host: "{{ db_host }}"
     login_user: "{{ db_user }}"
-    login_password: "{{ db_password }}"
+    login_password: >-
+      {{ (app == 'jira') 
+         | ternary(jira_db_password, confluence_db_password) }}
     db: "{{ db_name }}"
   become: false
 
