@@ -4,6 +4,8 @@
   become: false
   gather_facts: true
 
+  vars_files:
+    - inventories/production/group_vars/vault.yml
   roles:
     - common
 
