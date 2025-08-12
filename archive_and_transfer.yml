@@ -4,6 +4,9 @@
   become: false
   gather_facts: true
 
+  vars_files:
+    - vault.yml
+
   roles:
     - common
 
