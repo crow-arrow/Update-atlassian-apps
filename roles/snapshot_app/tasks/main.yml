@@ -15,8 +15,8 @@
       -Fc {{ db_name }} > {{ snapshot_dir }}/{{ now }}_{{ instance }}.dump
   args:
     executable: /bin/bash
-    become: true
-    become_user: jira
+  become: true
+  become_user: jira
 
 - name: Find first-level attachment subdirs (excluding 'insight')
   find:
