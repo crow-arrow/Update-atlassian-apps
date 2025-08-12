@@ -4,7 +4,7 @@ app: confluence
 ENV_USER: confluence
 db_name: shared_eazybi_int
 db_user: shared_eazybi_user
-db_host: sndcb00581i.polygran.noris.de
+db_host: sndcb00582p.polygran.noris.de
 db_pass: "{{ (app == 'jira') | ternary(jira_db_password, confluence_db_password) }}"
 SERVICE_NAME: pilot-aftersales.service
 REMOTE_HOST: atlassian-int.mercedes-benz.polygran.de

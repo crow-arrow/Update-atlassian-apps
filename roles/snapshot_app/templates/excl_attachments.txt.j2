@@ -1,0 +1,3 @@
+{% for dir in attachment_dirs.files[1:] %}
+data/attachments/{{ dir.path | basename }}/*
+{% endfor %}

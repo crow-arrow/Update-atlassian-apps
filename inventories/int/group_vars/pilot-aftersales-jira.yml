@@ -4,7 +4,7 @@ app: jira
 ENV_USER: jira
 db_name: gspopl_jira_int
 db_user: gspopl_jira_user
-db_host: sndcb00581i.polygran.noris.de
+db_host: sndcb00582p.polygran.noris.de
 db_pass: "{{ (app == 'jira') | ternary(jira_db_password, confluence_db_password) }}"
 db_port: 5432
 SERVICE_NAME: pilot-aftersales.service
