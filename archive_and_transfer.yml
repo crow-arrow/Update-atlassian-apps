@@ -7,6 +7,13 @@
   roles:
     - common
 
+  pre_tasks:
+    - name: Validate survey var
+      ansible.builtin.assert:
+        that:
+          - app is defined
+          - app in ['jira', 'confluence']
+
   tasks:
 
     - name: Create application snapshot
