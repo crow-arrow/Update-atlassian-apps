@@ -1,7 +1,11 @@
 ---
+ansible_host: sndca00572p.polygran.noris.de
+instance: pilot-aftersales
+app: jira
 ENV_USER: jira
 db_name: gspopl_jira
 db_user: gspopl_jira_user
 db_pass: "{{ vault_gspopl_jira_password }}"
 db_host: sndcb00582p.polygran.noris.de
 db_port: 5432
+REMOTE_HOST: sndca00572p.polygran.noris.de

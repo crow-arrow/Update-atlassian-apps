@@ -1,6 +1,0 @@
-ansible_host: sndca00573p.polygran.noris.de
-
-app: confluence
-instance: pilot-aftersales-confluence
-
-REMOTE_HOST: sndca00573p.polygran.noris.de

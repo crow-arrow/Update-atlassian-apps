@@ -1,6 +1,0 @@
-ansible_host: sndca00572p.polygran.noris.de
-
-app: jira
-instance: pilot-aftersales
-
-REMOTE_HOST: sndca00572p.polygran.noris.de

@@ -1,6 +1,9 @@
-app: jira
+ansible_host: sndca00578i.polygran.noris.de
 instance: pilot-aftersales
+app: jira
+ENV_USER: jira
 db_name: gspopl_jira_int
 db_user: gspopl_jira_user
 db_host: sndcb00581i.polygran.noris.de
 SERVICE_NAME: pilot-aftersales.service
+REMOTE_HOST: atlassian-int.mercedes-benz.polygran.de

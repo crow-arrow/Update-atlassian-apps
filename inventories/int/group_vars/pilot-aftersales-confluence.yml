@@ -1,6 +1,9 @@
-app: confluence
+ansible_host: sndca00578i.polygran.noris.de
 instance: pilot-aftersales-confluence
+app: confluence
+ENV_USER: confluence
 db_name: shared_eazybi_int
 db_user: shared_eazybi_user
 db_host: sndcb00581i.polygran.noris.de
 SERVICE_NAME: pilot-aftersales.service
+REMOTE_HOST: atlassian-int.mercedes-benz.polygran.de
