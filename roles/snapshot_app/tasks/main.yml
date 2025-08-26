@@ -65,20 +65,36 @@
     state: absent
   when: attachment_dirs.files | length > 1
 
+- name: Find all attachment dirs (recursively)
+  ansible.builtin.find:
+    paths: "{{ application_data_home }}/data/attachments"
+    file_type: directory
+    recurse: true
+  register: attachment_dirs_recursive
+  when: lookup('ansible.builtin.stat', application_data_home + '/data/attachments').stat.exists
+
 - name: Set permissions on attachment dirs
-  file:
+  ansible.builtin.file:
     path: "{{ item.path }}"
     mode: '0750'
-  loop: "{{ lookup('ansible.builtin.find', paths=application_data_home + '/data/attachments', file_type='directory', recurse=True).files }}"
-  when: lookup('ansible.builtin.stat', application_data_home + '/data/attachments').stat.exists
+  loop: "{{ attachment_dirs_recursive.files }}"
+  when: attachment_dirs_recursive is defined
   become: false
 
+- name: Find all attachment files (recursive)
+  ansible.builtin.find:
+    paths: "{{ application_data_home }}/data/attachments"
+    file_type: file
+    recurse: true
+  register: attachment_files
+  when: lookup('ansible.builtin.stat', application_data_home + '/data/attachments').stat.exists
+
 - name: Set permissions on attachment files
-  file:
+  ansible.builtin.file:
     path: "{{ item.path }}"
     mode: '0640'
-  loop: "{{ lookup('ansible.builtin.find', paths=application_data_home + '/data/attachments', file_type='file', recurse=True).files }}"
-  when: lookup('ansible.builtin.stat', application_data_home + '/data/attachments').stat.exists
+  loop: "{{ attachment_files.files }}"
+  when: attachment_files is defined
   become: false
 
 - name: Create appdata archive
