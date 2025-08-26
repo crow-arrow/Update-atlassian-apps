@@ -71,7 +71,7 @@
     mode: '0750'
   loop: "{{ lookup('ansible.builtin.find', paths=application_data_home + '/data/attachments', file_type='directory', recurse=True).files }}"
   when: lookup('ansible.builtin.stat', application_data_home + '/data/attachments').stat.exists
-  become: true
+  become: false
 
 - name: Set permissions on attachment files
   file:
@@ -79,7 +79,7 @@
     mode: '0640'
   loop: "{{ lookup('ansible.builtin.find', paths=application_data_home + '/data/attachments', file_type='file', recurse=True).files }}"
   when: lookup('ansible.builtin.stat', application_data_home + '/data/attachments').stat.exists
-  become: true
+  become: false
 
 - name: Create appdata archive
   shell: |
@@ -90,7 +90,7 @@
       -zcvf '{{ snapshot_dir }}/{{ now }}_{{ instance }}_appdata.tgz' .
   args:
     chdir: "{{ application_install_dir }}"
-  become: true
+  become: false
 
 - name: Find old snapshots
   find:
