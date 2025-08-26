@@ -57,7 +57,7 @@
       -zcvf '{{ snapshot_dir }}/{{ now }}_{{ instance }}_homedir.tgz' .
   args:
     chdir: "{{ application_data_home }}"
-  become: true
+  become: false
 
 - name: Remove temporary exclude-from file
   file:
