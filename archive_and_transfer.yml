@@ -5,7 +5,7 @@
   gather_facts: true
 
   vars_files:
-    - inventories/int/group_vars/vault.yml
+    - inventories/production/group_vars/vault.yml
 
   roles:
     - common

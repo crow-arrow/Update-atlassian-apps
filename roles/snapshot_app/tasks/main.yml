@@ -8,13 +8,17 @@
   set_fact:
     now: "{{ ansible_date_time.date | regex_replace('-', '') }}"
 
-- name: Dump PostgreSQL DB using pg_dump
-  shell: |
-    export PGPASSWORD="{{ db_pass }}" && \
-    pg_dump -U {{ db_user }} -h {{ db_host }} -p {{ db_port | default(5432) }} \
-      -Fc {{ db_name }} > {{ snapshot_dir }}/{{ now }}_{{ instance }}.dump
-  args:
-    executable: /bin/bash
+- name: Dump PostgreSQL DB using Ansible module
+  community.postgresql.postgresql_db:
+    name: "{{ db_name }}"
+    state: dump
+    target: "{{ snapshot_dir }}/{{ now }}_{{ instance }}.dump"
+    login_host: "{{ db_host }}"
+    login_port: "{{ db_port | default(5432) }}"
+    login_user: "{{ db_user }}"
+    login_password: >-
+      {{ (app == 'jira') | ternary(jira_db_password, confluence_db_password) }}
+  become: false
 
 - name: Find first-level attachment subdirs (excluding 'insight')
   find:
@@ -25,6 +29,10 @@
     excludes: insight
   register: attachment_dirs
   ignore_errors: true
+
+- name: Who am I
+  debug:
+    msg: "Running on {{ inventory_hostname }}"
 
 - name: Render exclude-from file
   template:

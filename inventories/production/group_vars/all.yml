@@ -1,7 +1,6 @@
 env: production
 
 now: "{{ lookup('pipe','date +%Y%m%d') }}"
-LOCAL_USER: sascdism
 
 app_base: /opt/atlassian
 app_data_base: /var/atlassian/application-data
