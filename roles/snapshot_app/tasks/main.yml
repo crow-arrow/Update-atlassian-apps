@@ -30,10 +30,6 @@
   register: attachment_dirs
   ignore_errors: true
 
-- name: Who am I
-  debug:
-    msg: "Running on {{ inventory_hostname }}"
-
 - name: Render exclude-from file
   template:
     src: excl_attachments.txt.j2
@@ -84,6 +80,7 @@
     mode: '0750'
   loop: "{{ attachment_dirs_recursive.files }}"
   when: attachment_dirs_recursive is defined
+  no_log: True
   become: false
   become_user: "{{ ENV_USER | default('jira') }}"
 
@@ -101,6 +98,7 @@
     mode: '0640'
   loop: "{{ attachment_files.files }}"
   when: attachment_files is defined
+  no_log: True
   become: false
   become_user: "{{ ENV_USER | default('jira') }}"
 
