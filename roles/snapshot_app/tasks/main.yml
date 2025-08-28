@@ -2,6 +2,14 @@
   set_fact:
     now: "{{ ansible_date_time.date | regex_replace('-', '') }}"
 
+- name: Check current user on managed host
+  ansible.builtin.command: whoami
+  register: whoami_result
+
+- name: Show executing user
+  debug:
+    msg: "Current user: {{ whoami_result.stdout }}"
+
 - name: Dump PostgreSQL DB using Ansible module
   community.postgresql.postgresql_db:
     name: "{{ db_name }}"
