@@ -90,7 +90,7 @@
       --exclude='./work/*' \
       -zcvf '{{ snapshot_dir }}/{{ now }}_{{ instance }}_appdata.tgz' .
   args:
-    chdir: "{{ application_install_dir }}"
+    chdir: "{{ app_base }}/{{ app }}"
   become: false
 
 - name: Find old snapshots
