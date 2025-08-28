@@ -5,6 +5,7 @@
     owner: root
     group: root
     mode: '0755'
+  become_user: "{{ ENV_USER }}"
   loop:
     - "{{ upload_dir }}"
     - "{{ snapshot_dir }}"
