@@ -66,42 +66,21 @@
     path: "{{ application_data_home }}/data/attachments"
   register: attachments_dir_status
 
-- name: Find all attachment directories (recursive)
-  ansible.builtin.find:
-    paths: "{{ application_data_home }}/data/attachments"
-    file_type: directory
-    recurse: true
-  register: attachment_dirs_recursive
+- name: Set permissions on attachment directories (fast)
+  ansible.builtin.command: >
+    find {{ application_data_home }}/data/attachments -type d -print0 |
+    xargs -0 chmod 0750
   when: attachments_dir_status.stat.exists
-
-- name: Set permissions on attachment directories
-  ansible.builtin.file:
-    path: "{{ item.path }}"
-    mode: '0750'
-  loop: "{{ attachment_dirs_recursive.files }}"
-  when: attachment_dirs_recursive is defined
-  no_log: True
   become: false
   become_user: "{{ ENV_USER | default('jira') }}"
 
-- name: Find all attachment files (recursive)
-  ansible.builtin.find:
-    paths: "{{ application_data_home }}/data/attachments"
-    file_type: file
-    recurse: true
-  register: attachment_files
+- name: Set permissions on attachment files (fast)
+  ansible.builtin.command: >
+    find {{ application_data_home }}/data/attachments -type f -print0 |
+    xargs -0 chmod 0640
   when: attachments_dir_status.stat.exists
-
-- name: Set permissions on attachment files
-  ansible.builtin.file:
-    path: "{{ item.path }}"
-    mode: '0640'
-  loop: "{{ attachment_files.files }}"
-  when: attachment_files is defined
-  no_log: True
   become: false
   become_user: "{{ ENV_USER | default('jira') }}"
-
 
 - name: Create appdata archive
   shell: |
