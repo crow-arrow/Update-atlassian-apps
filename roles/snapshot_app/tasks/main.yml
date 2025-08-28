@@ -55,6 +55,8 @@
       --exclude='./import/*' \
       --exclude='./log/*' \
       --exclude='./tmp/*' \
+      --exclude='{{ homedir_archive | basename }}' \
+      --ignore-failed-read \
       -zcvf '{{ homedir_archive }}' .
   args:
     chdir: "{{ application_data_home }}"
