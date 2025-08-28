@@ -2,6 +2,10 @@
   set_fact:
     now: "{{ ansible_date_time.date | regex_replace('-', '') }}"
 
+- name: Set homedir archive path
+  set_fact:
+    homedir_archive: "{{ snapshot_dir }}/{{ now }}_{{ instance }}_homedir.tgz"
+
 - name: Check current user on managed host
   ansible.builtin.command: whoami
   register: whoami_result
