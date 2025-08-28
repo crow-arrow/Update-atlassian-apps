@@ -56,7 +56,8 @@
       -zcvf '{{ snapshot_dir }}/{{ now }}_{{ instance }}_homedir.tgz' .
   args:
     chdir: "{{ application_data_home }}"
-  become: false
+  become: true
+  become_user: "{{ ENV_USER }}"
 
 - name: Remove temporary exclude-from file
   file:
@@ -74,16 +75,16 @@
     find {{ application_data_home }}/data/attachments -type d -print0 |
     xargs -0 chmod 0750
   when: attachments_dir_status.stat.exists
-  become: false
-  become_user: "{{ ENV_USER | default('jira') }}"
+  become: true
+  become_user: "{{ ENV_USER }}"
 
 - name: Set permissions on attachment files (fast)
   ansible.builtin.command: >
     find {{ application_data_home }}/data/attachments -type f -print0 |
     xargs -0 chmod 0640
   when: attachments_dir_status.stat.exists
-  become: false
-  become_user: "{{ ENV_USER | default('jira') }}"
+  become: true
+  become_user: "{{ ENV_USER }}"
 
 - name: Create appdata archive
   shell: |
