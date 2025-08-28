@@ -10,6 +10,7 @@
     mode: '0755'
   delegate_to: localhost
   run_once: true
+  become: false
 
 - name: Stat appdata archive
   ansible.builtin.stat:
