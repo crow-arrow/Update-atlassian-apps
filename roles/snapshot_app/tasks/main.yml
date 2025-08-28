@@ -20,7 +20,7 @@
     login_user: "{{ db_user }}"
     login_password: >-
       {{ (app == 'jira') | ternary(jira_db_password, confluence_db_password) }}
-  become: false
+  become: true
 
 - name: Find first-level attachment subdirs (excluding 'insight')
   find:
