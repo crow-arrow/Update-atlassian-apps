@@ -44,18 +44,17 @@
     tar \
       --exclude='./caches/*' \
       --exclude='./data/backbone-issue-sync/*' \
+      --exclude-from='{{ snapshot_dir }}/excl_attachments.txt' \
       --exclude='./data/git-plugin/*' \
       --exclude='./eazybi.toml' \
       --exclude='./export/*' \
       --exclude='./import/*' \
       --exclude='./log/*' \
       --exclude='./tmp/*' \
-      {% if attachment_dirs.files|length > 1 %}
-      --exclude-from='{{ snapshot_dir }}/excl_attachments.txt' \
-      {% endif %}
-      -zcvf '{{ snapshot_dir }}/{{ now }}_{{ instance }}_homedir.tgz' .
+      -zcvf '{{ homedir_archive }}' .
   args:
     chdir: "{{ application_data_home }}"
+  when: attachment_dirs.files | length > 1
   become: true
   become_user: "{{ ENV_USER }}"
 
@@ -95,13 +94,14 @@
       -zcvf '{{ snapshot_dir }}/{{ now }}_{{ instance }}_appdata.tgz' .
   args:
     chdir: "{{ app_base }}/{{ app }}"
-  become: false
+  become: true
+  become_user: "{{ ENV_USER }}"
 
 - name: Find old snapshots
   find:
     paths: "{{ snapshot_dir }}"
     patterns: "{{ instance }}_*"
-    age: "{{ snapshot_retention_days }}d"
+    age: 365d
     recurse: no
   register: old_snapshots
 
