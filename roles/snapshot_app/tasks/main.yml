@@ -1,9 +1,3 @@
-- name: Ensure snapshot directory exists
-  file:
-    path: "{{ snapshot_dir }}"
-    state: directory
-    mode: '0755'
-
 - name: Set timestamp fact
   set_fact:
     now: "{{ ansible_date_time.date | regex_replace('-', '') }}"

@@ -1,4 +1,4 @@
-- name: Ensure snapshot and upload directories exist  
+- name: Ensure snapshot and upload directories exist
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory

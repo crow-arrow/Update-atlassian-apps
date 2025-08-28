@@ -1,7 +1,7 @@
 ---
 - name: Archive and transfer app snapshots from production
   hosts: "{{ app }}"
-  become: false
+  become_user: "{{ ENV_USER }}"
   gather_facts: true
 
   vars_files:
