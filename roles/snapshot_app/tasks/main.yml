@@ -14,7 +14,7 @@
   community.postgresql.postgresql_db:
     name: "{{ db_name }}"
     state: dump
-    target: "{{ snapshot_dir }}/{{ now }}_{{ instance }}.dump"
+    target_opts: "-f {{ snapshot_dir }}/{{ now }}_{{ instance }}.dump"
     login_host: "{{ db_host }}"
     login_port: "{{ db_port | default(5432) }}"
     login_user: "{{ db_user }}"
