@@ -1,6 +1,7 @@
 ansible_host: sndca00578i.polygran.noris.de
 instance: pilot-aftersales
 app: jira
+source_instance_host: "pilot-aftersales.mercedes-benz.polygran.de"
 ENV_USER: jira
 db_name: gspopl_jira_int
 db_user: gspopl_jira_user

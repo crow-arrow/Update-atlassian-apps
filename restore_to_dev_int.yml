@@ -1,11 +1,11 @@
 ---
 - name: Restore app to dev/int environment
-  hosts: staging
+  hosts: "{{ app }}"
   become: false
   gather_facts: false
 
   vars:
-    now: "{{ ansible_date_time.date }}"
+    now: "{{ lookup('pipe', 'date +%Y%m%d') }}"
 
   roles:
     - common  # базовые пути, пакеты
@@ -17,15 +17,15 @@
         name: service_control
       tags: [stop]
 
-    - name: Push archives to target host
-      import_role:
-        name: push_archives
-      tags: [push]
-
     - name: Backup current config before deployment
       import_role:
         name: backup_config
       tags: [backup]
+
+    - name: Push archives to target host
+      import_role:
+        name: push_archives
+      tags: [push]
 
     - name: Clean up previous instance files
       import_role:
@@ -49,19 +49,13 @@
       when: app == "confluence"
       tags: [restore]
 
-    - name: Configure JIRA-specific environment (baseurl, banner, confluence links)
-      import_role:
-        name: configure_jira_instance
-      when: app == "jira"
-      tags: [configure]
-
-    - name: Sync Confluence attachments
-      import_role:
-        name: sync_attachments
-      when: app == "confluence" and INCLUDE_ATTACHMENTS | default(false)
-      tags: [attachments]
-
     - name: Start application service
       import_role:
         name: service_control
       tags: [start]
+
+    - name: Trigger Jira reindex
+      import_tasks: roles/configure_jira_instance/tasks/reindex.yml
+      when: app == "jira"
+      tags: [reindex]
+

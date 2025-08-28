@@ -1,12 +1,16 @@
 ---
-- name: Restore PostgreSQL DB from dump (app-user only, no sudo)
-  shell: |
-    export PGPASSWORD="{{ db_pass }}" \
-    pg_restore -U {{ db_user }} -h {{ db_host }} -p {{ db_port | default(5432) }} \
-      -c --if-exists -d {{ db_name }} {{ upload_dir }}/{{ now }}_{{ instance }}.dump
-  args:
-    executable: /bin/bash
+- name: Restore PostgreSQL DB using Ansible module
+  community.postgresql.postgresql_db:
+    name: "{{ db_name }}"
+    state: restore
+    target: "{{ upload_dir }}/{{ now }}_{{ instance }}.dump"
+    login_host: "{{ db_host }}"
+    login_port: "{{ db_port | default(5432) }}"
+    login_user: "{{ db_user }}"
+    login_password: >-
+      {{ (app == 'jira') | ternary(jira_db_password, confluence_db_password) }}
+    encoding: UTF8
+    target_opts: "-c --if-exists"
   register: restore_result
-  changed_when: "'restoring data' in restore_result.stdout or 'processing data' in restore_result.stdout"
-  failed_when: restore_result.rc != 0
+  become: false
   tags: restore

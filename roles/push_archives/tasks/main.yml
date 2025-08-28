@@ -1,26 +1,29 @@
 ---
-- name: Push archives to dev/int host from AWX controller
-  hosts: dev
-    when: env = dev
-  become: true
-  gather_facts: false
-
-  vars:
+- name: Set timestamp fact
+  ansible.builtin.set_fact:
     now: "{{ lookup('pipe', 'date +%Y%m%d') }}"
 
-  tasks:
-    - name: Push app archive
-      copy:
-        src: "{{ upload_dir }}/{{ now }}_{{ instance }}_appdata.tgz"
-        dest: "{{ upload_dir }}/"
+- name: Ensure upload directory exists on target host
+  file:
+    path: "{{ upload_dir }}"
+    state: directory
+    mode: '0755'
 
-    - name: Push home archive
-      copy:
-        src: "{{ upload_dir }}/{{ now }}_{{ instance }}_homedir.tgz"
-        dest: "{{ upload_dir }}/"
+- name: Copy DB dump (Jira only)
+  ansible.builtin.copy:
+    src: "{{ upload_dir }}/{{ source_instance_host }}/{{ now }}_{{ instance }}.dump"
+    dest: "{{ upload_dir }}/"
+    mode: '0644'
+  when: app == "jira"
 
-    - name: Push DB dump (Jira only)
-      copy:
-        src: "{{ upload_dir }}/{{ now }}_{{ instance }}.dump"
-        dest: "{{ upload_dir }}/"
-      when: app == "jira"
+- name: Copy homedir archive
+  ansible.builtin.copy:
+    src: "{{ upload_dir }}/{{ source_instance_host }}/{{ now }}_{{ instance }}_homedir.tgz"
+    dest: "{{ upload_dir }}/"
+    mode: '0644'
+
+- name: Copy appdata archive
+  ansible.builtin.copy:
+    src: "{{ upload_dir }}/{{ source_instance_host }}/{{ now }}_{{ instance }}_appdata.tgz"
+    dest: "{{ upload_dir }}/"
+    mode: '0644'
