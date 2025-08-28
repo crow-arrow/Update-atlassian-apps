@@ -14,13 +14,14 @@
   community.postgresql.postgresql_db:
     name: "{{ db_name }}"
     state: dump
-    target_opts: "-f {{ snapshot_dir }}/{{ now }}_{{ instance }}.dump"
+    target: "{{ snapshot_dir }}/{{ now }}_{{ instance }}.dump"
     login_host: "{{ db_host }}"
     login_port: "{{ db_port | default(5432) }}"
     login_user: "{{ db_user }}"
     login_password: >-
       {{ (app == 'jira') | ternary(jira_db_password, confluence_db_password) }}
   become: true
+  become_user: "{{ ENV_USER }}"
 
 - name: Find first-level attachment subdirs (excluding 'insight')
   find:
