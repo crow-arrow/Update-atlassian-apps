@@ -1,1 +1,1 @@
-upload_dir: "/tmp/awx_uploads/{{ inventory_hostname }}"
+awx_upload_dir: "/tmp/awx_uploads"

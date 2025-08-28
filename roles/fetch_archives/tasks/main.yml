@@ -5,7 +5,7 @@
 
 - name: Ensure upload directory exists on AWX controller
   ansible.builtin.file:
-    path: "{{ upload_dir }}"
+    path: "{{ awx_upload_dir }}"
     state: directory
     mode: '0755'
   delegate_to: localhost
@@ -20,7 +20,7 @@
 - name: Fetch appdata archive
   ansible.builtin.fetch:
     src:  "{{ snapshot_dir }}/{{ now }}_{{ instance }}_appdata.tgz"
-    dest: "{{ upload_dir }}/{{ inventory_hostname }}/"
+    dest: "{{ awx_upload_dir }}/{{ inventory_hostname }}/"
     flat: yes
     force: no
   when: stat_app.stat.exists
@@ -33,7 +33,7 @@
 - name: Fetch homedir archive
   ansible.builtin.fetch:
     src:  "{{ snapshot_dir }}/{{ now }}_{{ instance }}_homedir.tgz"
-    dest: "{{ upload_dir }}/"
+    dest: "{{ awx_upload_dir }}/"
     flat: yes
     force: no
   when: stat_home.stat.exists
@@ -46,7 +46,7 @@
 - name: Fetch DB dump
   ansible.builtin.fetch:
     src:  "{{ snapshot_dir }}/{{ now }}_{{ instance }}.dump"
-    dest: "{{ upload_dir }}/{{ inventory_hostname }}/"
+    dest: "{{ awx_upload_dir }}/{{ inventory_hostname }}/"
     flat: yes
     force: no
   when: stat_db.stat.exists
