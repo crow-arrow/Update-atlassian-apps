@@ -76,7 +76,7 @@
   register: attachments_dir_status
 
 - name: Set permissions on attachment directories (fast)
-  ansible.builtin.command: >
+  ansible.builtin.shell: >
     find {{ application_data_home }}/data/attachments -type d -print0 |
     xargs -0 chmod 0750
   when: attachments_dir_status.stat.exists
@@ -84,7 +84,7 @@
   become_user: "{{ ENV_USER }}"
 
 - name: Set permissions on attachment files (fast)
-  ansible.builtin.command: >
+  ansible.builtin.shell: >
     find {{ application_data_home }}/data/attachments -type f -print0 |
     xargs -0 chmod 0640
   when: attachments_dir_status.stat.exists
