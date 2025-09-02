@@ -1,14 +1,16 @@
 ---
+- name: Set service name depending on environment
+  set_fact:
+    SERVICE_NAME: "{{ lookup('vars', ENV | upper + '_SERVICE_NAME') }}"
+
 - name: Stop service
   ansible.builtin.service:
     name: "{{ SERVICE_NAME }}"
     state: stopped
-  become: true
   tags: stop
 
 - name: Start service
   ansible.builtin.service:
     name: "{{ SERVICE_NAME }}"
     state: started
-  become: true
   tags: start

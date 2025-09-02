@@ -1,14 +1,15 @@
 ---
 - name: Restore app to dev/int environment
-  hosts: "{{ app }}"
-  become: false
+  hosts: "{{ instance }}"
+  become: true
+  become_user: "{{ ENV_USER }}"
   gather_facts: false
 
   vars:
     now: "{{ lookup('pipe', 'date +%Y%m%d') }}"
 
   roles:
-    - common  # базовые пути, пакеты
+    - common
 
   tasks:
 

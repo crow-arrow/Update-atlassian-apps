@@ -7,5 +7,5 @@ db_name: shared_eazybi_int
 db_user: shared_eazybi_user
 db_host: sndcb00582p.polygran.noris.de
 db_pass: "{{ (app == 'jira') | ternary(jira_db_password, confluence_db_password) }}"
-SERVICE_NAME: pilot-aftersales.service
-REMOTE_HOST: atlassian-int.mercedes-benz.polygran.de
+DEV_SERVICE_NAME: dev-pilot-aftersales.service
+INT_SERVICE_NAME: int-pilot-aftersales.service
