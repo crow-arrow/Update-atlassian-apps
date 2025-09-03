@@ -55,8 +55,8 @@
         name: service_control
       tags: [start]
 
-    - name: Trigger Jira reindex
-      import_tasks: roles/configure_jira_instance/tasks/reindex.yml
-      when: app == "jira"
-      tags: [reindex]
+    #- name: Trigger Jira reindex
+     # import_tasks: roles/configure_jira_instance/tasks/reindex.yml
+     # when: app == "jira"
+     # tags: [reindex]
 
