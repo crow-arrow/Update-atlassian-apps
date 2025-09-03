@@ -1,24 +1,25 @@
 ---
-- name: Create { app } app directory
-  file:
-    path: "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}"
-    state: directory
-    mode: '0755'
+- name: Restore | dbconfig.xml <- parent
+  ansible.builtin.command: >
+    /bin/cp "{{ app_data_base }}/{{ env }}/{{ app }}/jira/{{ instance }}_dbconfig.xml"
+            "{{ app_data_base }}/{{ env }}/{{ app }}/jira/{{ instance }}/dbconfig.xml"
+  become: true
 
-- name: Create {{ app }} home directory
-  file:
-    path: "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}"
-    state: directory
-    mode: '0755'
+- name: Restore | eazybi.toml <- parent
+  ansible.builtin.command: >
+    /bin/cp "{{ app_data_base }}/{{ env }}/{{ app }}/jira/{{ instance }}_eazybi.toml"
+            "{{ app_data_base }}/{{ env }}/{{ app }}/jira/{{ instance }}/eazybi.toml"
+  become: true
 
-- name: Unpack app tarball
-  unarchive:
-    src: "{{ upload_dir }}/{{ now }}_{{ instance }}_appdata.tgz"
-    dest: "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}"
-    remote_src: yes
+- name: Restore | server.xml <- parent
+  ansible.builtin.command: >
+    /bin/cp "{{ app_base }}/{{ env }}/{{ app }}/jira/{{ instance }}_server.xml"
+            "{{ app_base }}/{{ env }}/{{ app }}/jira/{{ instance }}/conf/server.xml"
+  become: true
 
-- name: Unpack home dir tarball
-  unarchive:
-    src: "{{ upload_dir }}/{{ now }}_{{ instance }}_homedir.tgz"
-    dest: "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}"
-    remote_src: yes
+- name: Restore | setenv.sh <- parent
+  ansible.builtin.command: >
+    /bin/cp "{{ app_base }}/{{ env }}/{{ app }}/jira/{{ instance }}_setenv.sh"
+            "{{ app_base }}/{{ env }}/{{ app }}/jira/{{ instance }}/bin/setenv.sh"
+  become: true
+
