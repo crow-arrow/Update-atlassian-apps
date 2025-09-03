@@ -7,10 +7,10 @@
   ansible.builtin.service:
     name: "{{ SERVICE_NAME }}"
     state: stopped
-  tags: stop
+  when: service_action == "stop"
 
 - name: Start service
   ansible.builtin.service:
     name: "{{ SERVICE_NAME }}"
     state: started
-  tags: start
+  when: service_action == "start"
