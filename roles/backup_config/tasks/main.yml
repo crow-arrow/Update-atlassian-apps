@@ -2,6 +2,10 @@
   set_fact:
     backup_timestamp: "{{ ansible_date_time.iso8601 }}"
 
+- name: Debug app
+  debug:
+    var: app
+
 - name: Ensure backup directory exists
   file:
     path: "/tmp/{{ app }}_backup/{{ instance }}/{{ backup_timestamp }}"
