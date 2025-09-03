@@ -8,4 +8,4 @@ db_user: shared_eazybi_user
 db_host: sndcb00582p.polygran.noris.de
 db_pass: "{{ (app == 'jira') | ternary(jira_db_password, confluence_db_password) }}"
 DEV_SERVICE_NAME: dev-pilot-aftersales.service
-INT_SERVICE_NAME: int-pilot-aftersales.service
+INT_SERVICE_NAME: pilot-aftersales-confluence.service
