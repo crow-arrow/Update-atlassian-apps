@@ -12,5 +12,6 @@
     encoding: UTF8
     target_opts: "-c --if-exists"
   register: restore_result
-  become: false
+  become: true
+  become_user: "{{ ENV_USER }}"
   tags: restore
