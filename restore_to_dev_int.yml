@@ -3,7 +3,7 @@
   hosts: "{{ instance }}"
   become: true
   become_user: "{{ ENV_USER }}"
-  gather_facts: false
+  gather_facts: true
 
   vars:
     now: "{{ lookup('pipe', 'date +%Y%m%d') }}"
