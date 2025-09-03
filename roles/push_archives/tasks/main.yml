@@ -1,29 +1,24 @@
 ---
 - name: Set timestamp fact
-  ansible.builtin.set_fact:
+  set_fact:
     now: "{{ lookup('pipe', 'date +%Y%m%d') }}"
 
 - name: Ensure upload directory exists on target host
-  file:
+  ansible.builtin.file:
     path: "{{ upload_dir }}"
     state: directory
     mode: '0755'
 
-- name: Copy DB dump (Jira only)
-  ansible.builtin.copy:
-    src: "{{ upload_dir }}/{{ source_instance_host }}/{{ now }}_{{ instance }}.dump"
+- name: Synchronize snapshot artifacts from AWX to target host
+  ansible.posix.synchronize:
+    src: "{{ awx_upload_dir }}/{{ source_instance_host }}/"
     dest: "{{ upload_dir }}/"
-    mode: '0644'
-  when: app == "jira"
-
-- name: Copy homedir archive
-  ansible.builtin.copy:
-    src: "{{ upload_dir }}/{{ source_instance_host }}/{{ now }}_{{ instance }}_homedir.tgz"
-    dest: "{{ upload_dir }}/"
-    mode: '0644'
-
-- name: Copy appdata archive
-  ansible.builtin.copy:
-    src: "{{ upload_dir }}/{{ source_instance_host }}/{{ now }}_{{ instance }}_appdata.tgz"
-    dest: "{{ upload_dir }}/"
-    mode: '0644'
+    mode: push
+    archive: true
+    compress: true
+    rsync_opts:
+      - "--include={{ now }}_*.dump"
+      - "--include={{ now }}_*.tgz"
+      - "--exclude=*"
+  delegate_to: localhost
+  become: false
