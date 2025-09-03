@@ -1,8 +1,8 @@
 ---
-- name: Set timestamp fact
+- name: Set timestamp (fallback if not provided)
   set_fact:
-    now: "{{ lookup('pipe', 'date +%Y%m%d') }}"
-
+    now: "{{ now | default(ansible_date_time.iso8601_basic[:8]) }}"
+    
 - name: Ensure upload directory exists on target host
   ansible.builtin.file:
     path: "{{ upload_dir }}"
@@ -11,7 +11,7 @@
 
 - name: Synchronize snapshot artifacts from AWX to target host
   ansible.posix.synchronize:
-    src: "{{ awx_upload_dir }}/{{ instance }}/"
+    src: "{{ snapshot_dir }}/"
     dest: "{{ upload_dir }}/"
     mode: push
     archive: true
@@ -20,6 +20,5 @@
       - "--include={{ now }}_*.dump"
       - "--include={{ now }}_*.tgz"
       - "--exclude=*"
-  delegate_to: localhost
-  become: false
+  delegate_to: "{{ source_instance_host }}"
   when: not ansible_check_mode

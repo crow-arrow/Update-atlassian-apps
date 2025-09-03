@@ -9,6 +9,7 @@
 - name: Check current user on managed host
   ansible.builtin.command: whoami
   register: whoami_result
+  changed_when: false
 
 - name: Show executing user
   debug:
@@ -26,6 +27,7 @@
       {{ (app == 'jira') | ternary(jira_db_password, confluence_db_password) }}
   become: true
   become_user: "{{ ENV_USER }}"
+  no_log: true
 
 - name: Find first-level attachment subdirs (excluding 'insight')
   find:

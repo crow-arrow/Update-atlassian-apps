@@ -14,24 +14,24 @@
 
 - name: Backup dbconfig.xml to controller
   ansible.builtin.command: >
-    /bin/cp -a "{{ app_data_base }}/{{ env }}/{{ app }}/jira/{{ instance }}/dbconfig.xml"
-             "{{ app_data_base }}/{{ env }}/{{ app }}/jira/{{ instance }}_dbconfig.xml"
+    /bin/cp -a "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}/dbconfig.xml"
+             "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}_dbconfig.xml"
   become: true
 
 - name: Backup eazybi.toml to controller
   ansible.builtin.command: >
-    /bin/cp -a "{{ app_data_base }}/{{ env }}/{{ app }}/jira/{{ instance }}/eazybi.toml"
-             "{{ app_data_base }}/{{ env }}/{{ app }}/jira/{{ instance }}_eazybi.toml"
+    /bin/cp -a "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}/eazybi.toml"
+             "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}_eazybi.toml"
   become: true
 
 - name: Backup server.xml to controller
   ansible.builtin.command: >
-    /bin/cp -a "{{ app_base }}/{{ env }}/{{ app }}/jira/{{ instance }}/conf/server.xml"
-             "{{ app_base }}/{{ env }}/{{ app }}/jira/{{ instance }}_server.xml"
+    /bin/cp -a "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}/conf/server.xml"
+             "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}_server.xml"
   become: true
 
 - name: Backup setenv.sh to controller
   ansible.builtin.command: >
-    /bin/cp -a "{{ app_base }}/{{ env }}/{{ app }}/jira/{{ instance }}/bin/setenv.sh"
-             "{{ app_base }}/{{ env }}/{{ app }}/jira/{{ instance }}_setenv.sh"
+    /bin/cp -a "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}/bin/setenv.sh"
+             "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}_setenv.sh"
   become: true

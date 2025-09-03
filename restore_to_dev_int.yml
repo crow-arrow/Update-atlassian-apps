@@ -16,6 +16,10 @@
 
   tasks:
 
+    - name: Set timestamp fact
+      ansible.builtin.set_fact:
+        now: "{{ ansible_date_time.date | regex_replace('-', '') }}"
+
     - name: Stop application service
       import_role:
         name: service_control
