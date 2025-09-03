@@ -4,7 +4,7 @@
 
 - name: Ensure upload directory exists on AWX controller
   ansible.builtin.file:
-    path: "{{ awx_upload_dir }}/{{ inventory_hostname }}"
+    path: "{{ awx_upload_dir }}/{{ instance }}"
     state: directory
     mode: '0755'
   delegate_to: localhost
@@ -14,7 +14,7 @@
 - name: Synchronize only current day's snapshot files
   ansible.posix.synchronize:
     src: "{{ snapshot_dir }}/"
-    dest: "{{ awx_upload_dir }}/{{ inventory_hostname }}/"
+    dest: "{{ awx_upload_dir }}/{{ instance }}/"
     mode: pull
     archive: true
     compress: true

@@ -11,7 +11,7 @@
 
 - name: Synchronize snapshot artifacts from AWX to target host
   ansible.posix.synchronize:
-    src: "{{ awx_upload_dir }}/{{ source_instance_host }}/"
+    src: "{{ awx_upload_dir }}/{{ instance }}/"
     dest: "{{ upload_dir }}/"
     mode: push
     archive: true
