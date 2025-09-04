@@ -9,6 +9,16 @@
     state: directory
     mode: '0755'
 
+- name: Who am I?
+  debug:
+    msg:
+      host: "{{ inventory_hostname }}"
+      groups: "{{ group_names }}"
+      
+- name: Debug ssh agent socket
+  debug:
+    var: lookup('env', 'SSH_AUTH_SOCK')
+
 - name: Check agent on INT
   shell: 'echo AUTH=$SSH_AUTH_SOCK; ssh-add -L'
   delegate_to: "{{ inventory_hostname }}"
