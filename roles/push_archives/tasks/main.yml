@@ -9,6 +9,13 @@
     state: directory
     mode: '0755'
 
+- name: Check agent on INT
+  shell: 'echo $SSH_AUTH_SOCK; ssh-add -L || true'
+  delegate_to: "{{ inventory_hostname }}"
+  become: true
+  become_user: "{{ ENV_USER }}"
+  changed_when: false
+
 - name: Synchronize snapshot artifacts from AWX to target host
   ansible.posix.synchronize:
     src: "{{ ansible_user  }}@{{ hostvars[prod_instance_host].ansible_host }}:{{ snapshot_dir }}/"
@@ -16,12 +23,9 @@
     mode: pull
     archive: true
     compress: true
+    use_ssh_args: true
     rsync_path: "sudo -n rsync"
     rsync_opts:
-      - >-
-        --rsh=ssh -o ForwardAgent=yes
-        {% if proxy_jump_host | default('') %} -o ProxyJump={{ proxy_jump_host }}{% endif %}
-        -o StrictHostKeyChecking=no
       - "--include={{ now }}_{{ instance }}.dump"
       - "--include={{ now }}_{{ instance }}_*.tgz"
       - "--exclude=*"
