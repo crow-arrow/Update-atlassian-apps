@@ -28,7 +28,7 @@
 
 - name: Pull PROD -> INT using AWX agent
   ansible.posix.synchronize:
-    src: "{{ hostvars[prod_instance_host].ansible_user | default('jira') }}@{{ hostvars[prod_instance_host].ansible_host | default(prod_instance_host) }}:/var/atlassian/application-data/do_not_delete/"
+    src: "amalyuld@{{ hostvars[prod_instance_host].ansible_host | default(prod_instance_host) }}:/var/atlassian/application-data/do_not_delete/"
     dest: "{{ upload_dir }}/"
     mode: pull
     archive: true
@@ -43,4 +43,5 @@
   become: true
   become_user: "{{ ENV_USER }}"
   become_flags: "-E"
+  when: "'int' in group_names"
   # when: not ansible_check_mode
