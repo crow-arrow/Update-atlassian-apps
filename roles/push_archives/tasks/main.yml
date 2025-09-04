@@ -34,7 +34,7 @@
     archive: true
     compress: true
     use_ssh_args: true
-    rsync_path: "sudo -n rsync"
+    rsync_path: "sudo -n -u {{ ENV_USER }} rsync"
     rsync_opts:
       - "--include={{ now }}_{{ instance }}.dump"
       - "--include={{ now }}_{{ instance }}_*.tgz"
