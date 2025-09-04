@@ -20,5 +20,5 @@
       - "--include={{ now }}_*.dump"
       - "--include={{ now }}_*.tgz"
       - "--exclude=*"
-  delegate_to: "{{ source_instance_host }}"
+  delegate_to: "{{ prod_instance_host }}"
   # when: not ansible_check_mode
