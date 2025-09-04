@@ -9,7 +9,7 @@
     state: directory
     mode: '0755'
 
-- name: Synchronize snapshot artifacts from AWX to "{{ target }}" host
+- name: Synchronize snapshot artifacts from AWX to target host
   ansible.posix.synchronize:
     src: "{{ ansible_user  }}@{{ hostvars[prod_instance_host].ansible_host }}:{{ snapshot_dir }}/"
     dest: "{{ upload_dir }}/"
@@ -18,7 +18,10 @@
     compress: true
     rsync_path: "sudo -n rsync"
     rsync_opts:
-      - "--rsh=ssh -o ForwardAgent=yes{{ proxy_jump_host is defined | ternary(' -o ProxyJump=' ~ proxy_jump_host, '') }} -o StrictHostKeyChecking=no"
+      - >-
+        --rsh=ssh -o ForwardAgent=yes
+        {% if proxy_jump_host | default('') %} -o ProxyJump={{ proxy_jump_host }}{% endif %}
+        -o StrictHostKeyChecking=no
       - "--include={{ now }}_{{ instance }}.dump"
       - "--include={{ now }}_{{ instance }}_*.tgz"
       - "--exclude=*"
