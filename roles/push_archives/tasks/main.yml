@@ -10,23 +10,25 @@
     mode: '0755'
 
 - name: Check agent on INT
-  shell: 'echo $SSH_AUTH_SOCK; ssh-add -L || true'
+  shell: 'echo AUTH=$SSH_AUTH_SOCK; ssh-add -L'
   delegate_to: "{{ inventory_hostname }}"
   become: true
   become_user: "{{ ENV_USER }}"
+  become_flags: "-E"
   changed_when: false
 
-- name: TEST | SSH INT -> PROD (BatchMode)
+- name: TEST | SSH INT -> PROD
   command: >
     ssh -o BatchMode=yes {{ hostvars[prod_instance_host].ansible_user | default('jira') }}@{{ hostvars[prod_instance_host].ansible_host | default(prod_instance_host) }} true
   delegate_to: "{{ inventory_hostname }}"
   become: true
   become_user: "{{ ENV_USER }}"
+  become_flags: "-E"
   changed_when: false
 
-- name: Synchronize snapshot artifacts from AWX to target host
+- name: Pull PROD -> INT using AWX agent
   ansible.posix.synchronize:
-    src: "{{ ansible_user  }}@{{ hostvars[prod_instance_host].ansible_host }}:{{ snapshot_dir }}/"
+    src: "{{ hostvars[prod_instance_host].ansible_user | default('jira') }}@{{ hostvars[prod_instance_host].ansible_host | default(prod_instance_host) }}:/var/atlassian/application-data/do_not_delete/"
     dest: "{{ upload_dir }}/"
     mode: pull
     archive: true
@@ -40,4 +42,5 @@
   delegate_to: "{{ inventory_hostname }}"
   become: true
   become_user: "{{ ENV_USER }}"
+  become_flags: "-E"
   # when: not ansible_check_mode
