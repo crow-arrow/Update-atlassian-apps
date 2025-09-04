@@ -9,16 +9,18 @@
     state: directory
     mode: '0755'
 
-- name: Synchronize snapshot artifacts from AWX to target host
+- name: Synchronize snapshot artifacts from AWX to "{{ target }}" host
   ansible.posix.synchronize:
-    src: "{{ snapshot_dir }}/"
+    src: "{{ ansible_user }}@{{ hostvars[prod_instance_host].ansible_host }}:{{ snapshot_dir }}/"
     dest: "{{ upload_dir }}/"
-    mode: push
+    mode: pull
     archive: true
     compress: true
     rsync_opts:
-      - "--include={{ now }}_*.dump"
-      - "--include={{ now }}_*.tgz"
+      - "--include={{ now }}_{{ instance }}_*.dump"
+      - "--include={{ now }}_{{ instance }}_*.tgz"
       - "--exclude=*"
-  delegate_to: "{{ prod_instance_host }}"
+  delegate_to: "{{ inventory_hostname }}"
+  become: true
+  become_user: "{{ ENV_USER }}"
   # when: not ansible_check_mode
