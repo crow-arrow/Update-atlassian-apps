@@ -16,6 +16,14 @@
   become_user: "{{ ENV_USER }}"
   changed_when: false
 
+- name: TEST | SSH INT -> PROD (BatchMode)
+  command: >
+    ssh -o BatchMode=yes {{ hostvars[prod_instance_host].ansible_user | default('jira') }}@{{ hostvars[prod_instance_host].ansible_host | default(prod_instance_host) }} true
+  delegate_to: "{{ inventory_hostname }}"
+  become: true
+  become_user: "{{ ENV_USER }}"
+  changed_when: false
+
 - name: Synchronize snapshot artifacts from AWX to target host
   ansible.posix.synchronize:
     src: "{{ ansible_user  }}@{{ hostvars[prod_instance_host].ansible_host }}:{{ snapshot_dir }}/"
