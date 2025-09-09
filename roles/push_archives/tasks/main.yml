@@ -1,7 +1,7 @@
 ---
 - name: Write private key to file (with mode 0600)
   copy:
-    content: "{{ POLYGRAN_PRIVATE_KEY }}"
+    content: "{{ lookup('env', 'POLYGRAN_PRIVATE_KEY') }}"
     dest: "{{ ssh_key_path }}"
     mode: '0600'
   # no_log: true
