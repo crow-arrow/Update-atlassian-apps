@@ -1,3 +1,7 @@
+- name: Set SSH key path
+  set_fact:
+    ssh_key_path: "/tmp/ssh_key.pem"
+
 - name: Fail if SSH key is not defined
   fail:
     msg: "POLYGRAN_PRIVATE_KEY is not defined!"
