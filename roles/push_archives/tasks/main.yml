@@ -3,6 +3,11 @@
     msg: "POLYGRAN_PRIVATE_KEY is not defined!"
   when: lookup('env', 'POLYGRAN_PRIVATE_KEY') | length == 0
 
+- name: Debug Check if SSH key from env is loaded
+  debug:
+    msg: "{{ lookup('env', 'POLYGRAN_PRIVATE_KEY') | trim }}"
+
+
 - name: Write private key to file (with mode 0600)
   copy:
     content: "{{ lookup('env', 'POLYGRAN_PRIVATE_KEY') | trim }}"
