@@ -4,7 +4,8 @@
   gather_facts: no
 
   tasks:
-    - name: Write SSH key from AWX credential to file
-      ansible.builtin.debug:
-        msg: "{{ lookup('env', 'ANSIBLE_PRIVATE_KEY') }}"
+    - name: Debug - Show snippet of ANSIBLE_PRIVATE_KEY
+      debug:
+        msg: "{{ lookup('env', 'ANSIBLE_PRIVATE_KEY')[:20] ~ '...' if lookup('env', 'ANSIBLE_PRIVATE_KEY') | length > 0 else 'missing ❌' }}"
+  
         
