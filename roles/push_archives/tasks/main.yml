@@ -28,6 +28,17 @@
       -o UserKnownHostsFile=/dev/null
       -i {{ ssh_key_path | trim }}
 
+- name: Show fingerprint of the SSH key
+  shell: "ssh-keygen -l -f {{ ssh_key_path }}"
+  register: ssh_fingerprint
+  delegate_to: "{{ inventory_hostname }}"
+  changed_when: false
+  failed_when: false
+
+- debug:
+    var: ssh_fingerprint.stdout
+
+
 - name: Set timestamp fallback
   set_fact:
     now: "{{ now | default(ansible_date_time.iso8601_basic[:8]) }}"
