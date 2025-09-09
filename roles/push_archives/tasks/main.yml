@@ -4,7 +4,7 @@
     content: "{{ lookup('env', 'POLYGRAN_PRIVATE_KEY') }}"
     dest: "{{ ssh_key_path }}"
     mode: '0600'
-  delegate_to: "{{ inventory_hostname }}"
+  delegate_to: "{{ localhost }}"
   no_log: true
 
 - name: Set SSH args to use private key
