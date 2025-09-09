@@ -19,7 +19,7 @@
   register: ssh_key_stat
 
 - debug:
-  msg: "SSH key exists: {{ ssh_key_stat.stat.exists }}, size: {{ ssh_key_stat.stat.size | default(0) }}, User: {{}}"
+  msg: "SSH key exists: {{ ssh_key_stat.stat.exists }}, size: {{ ssh_key_stat.stat.size | default(0) }}"
 
 - name: Set SSH args to use private key
   set_fact:
