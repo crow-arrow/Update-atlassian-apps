@@ -1,57 +1,41 @@
 ---
-- name: Set timestamp (fallback if not provided)
+- name: Write private key to file (with mode 0600)
+  copy:
+    content: "{{ POLYGRAN_PRIVATE_KEY }}"
+    dest: "{{ ssh_key_path }}"
+    mode: '0600'
+  no_log: true
+
+- name: Set SSH args to use private key
+  set_fact:
+    ansible_ssh_common_args: "-o StrictHostKeyChecking=no -i {{ ssh_key_path }}"
+
+- name: Set timestamp fallback
   set_fact:
     now: "{{ now | default(ansible_date_time.iso8601_basic[:8]) }}"
 
-- name: Ensure upload directory exists on target host
-  ansible.builtin.file:
+- name: Ensure upload dir exists
+  file:
     path: "{{ upload_dir }}"
     state: directory
     mode: '0755'
 
-- name: Who am I?
-  debug:
-    msg:
-      host: "{{ inventory_hostname }}"
-      groups: "{{ group_names }}"
-      
-- name: Debug ssh agent socket
-  debug:
-    var: lookup('env', 'SSH_AUTH_SOCK')
-
-- name: Check agent on INT
-  shell: 'echo AUTH=$SSH_AUTH_SOCK; ssh-add -L'
-  delegate_to: "{{ inventory_hostname }}"
-  become: true
-  become_user: "{{ ENV_USER }}"
-  become_flags: "-E"
-  changed_when: false
-
-- name: TEST | SSH INT -> PROD
-  command: >
-    ssh -o BatchMode=yes {{ hostvars[prod_instance_host].ansible_user | default('jira') }}@{{ hostvars[prod_instance_host].ansible_host | default(prod_instance_host) }} true
-  delegate_to: "{{ inventory_hostname }}"
-  become: true
-  become_user: "{{ ENV_USER }}"
-  become_flags: "-E"
-  changed_when: false
-
-- name: Pull PROD -> INT using AWX agent
+- name: Rsync from PROD to INT
   ansible.posix.synchronize:
     src: "amalyuld@{{ hostvars[prod_instance_host].ansible_host | default(prod_instance_host) }}:/var/atlassian/application-data/do_not_delete/"
     dest: "{{ upload_dir }}/"
     mode: pull
     archive: true
     compress: true
-    use_ssh_args: true
     rsync_path: "sudo -n -u {{ ENV_USER }} rsync"
     rsync_opts:
       - "--include={{ now }}_{{ instance }}.dump"
       - "--include={{ now }}_{{ instance }}_*.tgz"
       - "--exclude=*"
   delegate_to: "{{ inventory_hostname }}"
-  become: true
-  become_user: "{{ ENV_USER }}"
-  become_flags: "-E"
-  when: "'int' in group_names"
-  # when: not ansible_check_mode
+
+- name: Clean up private key
+  file:
+    path: "{{ ssh_key_path }}"
+    state: absent
+  when: ssh_key_path is defined
