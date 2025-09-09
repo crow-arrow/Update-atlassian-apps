@@ -39,7 +39,7 @@
   become: true
   become_user: "{{ ENV_USER }}"
 
-- name: Rsync from PROD to INT
+- name: Rsync archives from PROD to INT using SSH key
   ansible.posix.synchronize:
     src: "amalyuld@{{ hostvars[prod_instance_host].ansible_host | default(prod_instance_host) }}:/var/atlassian/application-data/do_not_delete/"
     dest: "{{ upload_dir }}/"
@@ -53,8 +53,12 @@
       - "--include={{ now }}_{{ instance }}_*.tgz"
       - "--exclude=*"
   delegate_to: "{{ inventory_hostname }}"
-  become: true
-  become_user: "{{ ENV_USER }}"
+  vars:
+    ansible_ssh_common_args: >-
+      -o StrictHostKeyChecking=no
+      -o UserKnownHostsFile=/dev/null
+      -i {{ ssh_key_path }}
+
 
 - name: Clean up private key
   file:
