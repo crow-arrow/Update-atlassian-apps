@@ -4,8 +4,8 @@
   gather_facts: no
 
   tasks:
-    - name: Debug - Show snippet of ANSIBLE_PRIVATE_KEY
+    - name: Show first 20 chars of ssh key
       debug:
-        msg: "{{ lookup('env', 'ANSIBLE_PRIVATE_KEY')[:20] ~ '...' if lookup('env', 'ANSIBLE_PRIVATE_KEY') | length > 0 else 'missing ❌' }}"
-  
+        msg: "{{ lookup('file', '/runner/env/ssh_key_data')[:20] ~ '...' }}"
+ 
         
