@@ -11,9 +11,6 @@
   vars_files:
     - inventories/production/group_vars/vault.yml
 
-  roles:
-    - common
-
   tasks:
 
     - name: Set timestamp fact
