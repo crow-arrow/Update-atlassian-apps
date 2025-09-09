@@ -6,6 +6,6 @@
   tasks:
     - name: Debug - Show snippet of POLYGRAN_PRIVATE_KEY
       debug:
-        msg: "{{ lookup('env', 'POLYGRAN_PRIVATE_KEY') ~ '...' if lookup('env', 'ANSIBLE_PRIVATE_KEY') | length > 0 else 'missing ❌' }}"
+        msg: "{{ lookup('env', 'POLYGRAN_PRIVATE_KEY') ~ '...' if lookup('env', 'POLYGRAN_PRIVATE_KEY') | length > 0 else 'missing ❌' }}"
   
         
