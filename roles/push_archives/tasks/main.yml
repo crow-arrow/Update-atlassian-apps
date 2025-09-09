@@ -6,7 +6,7 @@
 
 - name: Write private key to file (with mode 0600)
   copy:
-    content: "{{ lookup('env', 'POLYGRAN_PRIVATE_KEY') }}"
+    content: "{{ lookup('env', 'POLYGRAN_PRIVATE_KEY') | trim }}"
     dest: "{{ ssh_key_path }}"
     mode: '0600'
   delegate_to: "{{ inventory_hostname }}"
