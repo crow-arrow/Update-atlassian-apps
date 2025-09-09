@@ -4,8 +4,8 @@
   gather_facts: no
 
   tasks:
-    - name: Show first 20 chars of ssh key
+    - name: Debug - Show snippet of POLYGRAN_PRIVATE_KEY
       debug:
-        msg: "{{ lookup('file', '/runner/env/ssh_key_data')[:20] ~ '...' }}"
- 
+        msg: "{{ lookup('env', 'POLYGRAN_PRIVATE_KEY') ~ '...' if lookup('env', 'ANSIBLE_PRIVATE_KEY') | length > 0 else 'missing ❌' }}"
+  
         
