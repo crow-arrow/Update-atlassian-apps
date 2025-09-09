@@ -1,15 +1,27 @@
 ---
+- name: Fail if SSH key is not defined
+  fail:
+    msg: "POLYGRAN_PRIVATE_KEY is not defined!"
+  when: lookup('env', 'POLYGRAN_PRIVATE_KEY') | length == 0
+
 - name: Write private key to file (with mode 0600)
   copy:
     content: "{{ lookup('env', 'POLYGRAN_PRIVATE_KEY') }}"
     dest: "{{ ssh_key_path }}"
     mode: '0600'
-  delegate_to: "{{ localhost }}"
+  delegate_to: "{{ inventory_hostname }}"
   no_log: true
+
+- name: Verify SSH key was created
+  stat:
+    path: "{{ ssh_key_path }}"
+  delegate_to: "{{ inventory_hostname }}"
+  register: ssh_key_stat
 
 - name: Set SSH args to use private key
   set_fact:
     ansible_ssh_common_args: "-o StrictHostKeyChecking=no -i {{ ssh_key_path }}"
+  when: ssh_key_stat.stat.exists
 
 - name: Set timestamp fallback
   set_fact:
@@ -40,3 +52,4 @@
     path: "{{ ssh_key_path }}"
     state: absent
   when: ssh_key_path is defined
+  delegate_to: "{{ inventory_hostname }}"
