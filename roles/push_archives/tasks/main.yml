@@ -1,4 +1,3 @@
----
 - name: Fail if SSH key is not defined
   fail:
     msg: "POLYGRAN_PRIVATE_KEY is not defined!"
@@ -18,15 +17,16 @@
   delegate_to: "{{ inventory_hostname }}"
   register: ssh_key_stat
 
-- debug:
+- name: Debug SSH key info
+  debug:
     msg: "SSH key exists: {{ ssh_key_stat.stat.exists }}, size: {{ ssh_key_stat.stat.size | default(0) }}"
 
 - name: Set SSH args to use private key
   set_fact:
-    ansible_ssh_common_args: >
+    ansible_ssh_common_args: >-
       -o StrictHostKeyChecking=no
       -o UserKnownHostsFile=/dev/null
-      -i {{ ssh_key_path }}
+      -i {{ ssh_key_path | trim }}
 
 - name: Set timestamp fallback
   set_fact:
@@ -53,12 +53,6 @@
       - "--include={{ now }}_{{ instance }}_*.tgz"
       - "--exclude=*"
   delegate_to: "{{ inventory_hostname }}"
-  vars:
-    ansible_ssh_common_args: >-
-      -o StrictHostKeyChecking=no
-      -o UserKnownHostsFile=/dev/null
-      -i {{ ssh_key_path }}
-
 
 - name: Clean up private key
   file:
