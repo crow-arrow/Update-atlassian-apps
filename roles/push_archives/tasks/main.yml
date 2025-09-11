@@ -11,7 +11,7 @@
 
 - name: Write private key to file (with mode 0600)
   copy:
-    content: "{{ lookup('env', 'POLYGRAN_PRIVATE_KEY') | trim }}"
+    content: "{{ lookup('env', 'POLYGRAN_PRIVATE_KEY') }}"
     dest: "{{ ssh_key_path }}"
     mode: '0600'
   delegate_to: "{{ inventory_hostname }}"
@@ -35,7 +35,7 @@
     ansible_ssh_common_args: >-
       -o StrictHostKeyChecking=no
       -o UserKnownHostsFile=/dev/null
-      -i {{ ssh_key_path | trim }}
+      -i {{ ssh_key_path }}
   become: false
 
 - name: Show fingerprint of the SSH key
