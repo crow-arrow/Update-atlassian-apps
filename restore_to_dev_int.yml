@@ -1,8 +1,7 @@
 ---
 - name: Restore app to dev/int environment
   hosts: "{{ instance }}"
-  become: true
-  become_user: "{{ ENV_USER }}"
+  become: false
   gather_facts: true
 
   vars:

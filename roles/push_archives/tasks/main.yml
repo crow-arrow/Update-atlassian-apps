@@ -14,7 +14,6 @@
     mode: '0600'
   delegate_to: "{{ inventory_hostname }}"
   no_log: true
-  become: false
 
 - name: Verify SSH key was created
   stat:
@@ -52,7 +51,6 @@
   file:
     path: "{{ upload_dir }}"
     state: directory
-  become: false
 
 - name: Rsync archives from PROD to INT using SSH key
   ansible.posix.synchronize:
@@ -67,7 +65,6 @@
       - "--include={{ now }}_{{ instance }}.dump"
       - "--include={{ now }}_{{ instance }}_*.tgz"
       - "--exclude=*"
-  become: false
 
 - name: Clean up private key
   file:
@@ -75,4 +72,3 @@
     state: absent
   when: ssh_key_path is defined
   delegate_to: "{{ inventory_hostname }}"
-  become: false
