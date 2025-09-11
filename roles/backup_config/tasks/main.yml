@@ -2,9 +2,10 @@
   set_fact:
     backup_timestamp: "{{ ansible_date_time.iso8601 }}"
 
-- name: Debug app
-  debug:
-    var: app
+- name: Check if instance directory exists
+  stat:
+    path: "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}"
+  register: instance_dir
 
 - name: Ensure backup directory exists
   file:
@@ -12,26 +13,30 @@
     state: directory
     mode: '0755'
 
-- name: Backup dbconfig.xml to controller
+- name: Backup dbconfig.xml
   ansible.builtin.command: >
     /bin/cp -a "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}/dbconfig.xml"
              "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}_dbconfig.xml"
   become: true
+  when: instance_dir.stat.exists
 
-- name: Backup eazybi.toml to controller
+- name: Backup eazybi.toml
   ansible.builtin.command: >
     /bin/cp -a "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}/eazybi.toml"
              "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}_eazybi.toml"
   become: true
+  when: instance_dir.stat.exists
 
-- name: Backup server.xml to controller
+- name: Backup server.xml
   ansible.builtin.command: >
     /bin/cp -a "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}/conf/server.xml"
              "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}_server.xml"
   become: true
+  when: instance_dir.stat.exists
 
-- name: Backup setenv.sh to controller
+- name: Backup setenv.sh
   ansible.builtin.command: >
     /bin/cp -a "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}/bin/setenv.sh"
              "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}_setenv.sh"
   become: true
+  when: instance_dir.stat.exists
