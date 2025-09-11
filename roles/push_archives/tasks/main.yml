@@ -14,6 +14,7 @@
     mode: '0600'
   delegate_to: "{{ inventory_hostname }}"
   no_log: true
+  become: false
 
 - name: Verify SSH key was created
   stat:
