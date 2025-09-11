@@ -66,19 +66,18 @@
   debug:
     msg: >-
       /usr/bin/rsync --archive --compress --rsh='ssh -i {{ ssh_key_path }} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
-      amalyuld@{{ hostvars[prod_instance_host].ansible_host }}:/var/atlassian/application-data/do_not_delete/
+      amalyuld@sndca00572p.polygran.noris.de:/var/atlassian/application-data/do_not_delete/
       {{ upload_dir }}/
 
 - name: Rsync archives from PROD to INT using SSH key
   ansible.posix.synchronize:
-    src: "amalyuld@{{ hostvars[prod_instance_host].ansible_host }}:/var/atlassian/application-data/do_not_delete/"
-    dest: "{{ upload_dir }}/"
+    src: "amalyuld@sndca00572p.polygran.noris.de:/var/atlassian/application-data/do_not_delete/"
     mode: pull
     compress: true
     recursive: true
     links: true
-    times: false             # ⛔ не копировать время
-    perms: false             # ⛔ не копировать права
+    times: false
+    perms: false
     rsync_path: "rsync"
     use_ssh_args: true
     rsync_opts:
