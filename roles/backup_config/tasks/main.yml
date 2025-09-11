@@ -1,42 +1,52 @@
-- name: Set backup timestamp
-  set_fact:
-    backup_timestamp: "{{ ansible_date_time.iso8601 }}"
-
 - name: Check if instance directory exists
   stat:
     path: "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}"
   register: instance_dir
 
-- name: Ensure backup directory exists
-  file:
-    path: "/tmp/{{ app }}_backup/{{ instance }}/{{ backup_timestamp }}"
-    state: directory
-    mode: '0755'
+- name: Check if dbconfig.xml exists
+  stat:
+    path: "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}/dbconfig.xml"
+  register: dbconfig_stat
+
+- name: Check if eazybi.toml exists
+  stat:
+    path: "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}/eazybi.toml"
+  register: eazybi_stat
+
+- name: Check if server.xml exists
+  stat:
+    path: "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}/conf/server.xml"
+  register: server_stat
+
+- name: Check if setenv.sh exists
+  stat:
+    path: "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}/bin/setenv.sh"
+  register: setenv_stat
 
 - name: Backup dbconfig.xml
-  ansible.builtin.command: >
-    /bin/cp -a "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}/dbconfig.xml"
-             "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}_dbconfig.xml"
+  command: >
+    cp -a "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}/dbconfig.xml"
+          "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}_dbconfig.xml"
   become: true
-  when: instance_dir.stat.exists
+  when: dbconfig_stat.stat.exists
 
 - name: Backup eazybi.toml
-  ansible.builtin.command: >
-    /bin/cp -a "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}/eazybi.toml"
-             "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}_eazybi.toml"
+  command: >
+    cp -a "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}/eazybi.toml"
+          "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}_eazybi.toml"
   become: true
-  when: instance_dir.stat.exists
+  when: eazybi_stat.stat.exists
 
 - name: Backup server.xml
-  ansible.builtin.command: >
-    /bin/cp -a "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}/conf/server.xml"
-             "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}_server.xml"
+  command: >
+    cp -a "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}/conf/server.xml"
+          "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}_server.xml"
   become: true
-  when: instance_dir.stat.exists
+  when: server_stat.stat.exists
 
 - name: Backup setenv.sh
-  ansible.builtin.command: >
-    /bin/cp -a "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}/bin/setenv.sh"
-             "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}_setenv.sh"
+  command: >
+    cp -a "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}/bin/setenv.sh"
+          "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}_setenv.sh"
   become: true
-  when: instance_dir.stat.exists
+  when: setenv_stat.stat.exists
