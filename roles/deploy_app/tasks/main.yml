@@ -1,39 +1,64 @@
 ---
-- name: Ensure app_data instance dir exists
+- name: Fail early if required variables are not defined
+  fail:
+    msg: "Missing required variable: {{ item }}"
+  when: hostvars[inventory_hostname][item] is not defined
+  loop:
+    - app
+    - instance
+    - env
+    - app_base
+    - app_data_base
+    - upload_dir
+
+- name: Set paths
+  set_fact:
+    app_path: "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}"
+    app_data_path: "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}"
+
+- name: Ensure instance directories exist
   file:
-    path: "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}"
+    path: "{{ item }}"
     state: directory
     mode: '0755'
+  loop:
+    - "{{ app_path }}/conf"
+    - "{{ app_path }}/bin"
+    - "{{ app_data_path }}"
   become: true
 
-- name: Restore | dbconfig.xml <- parent
-  ansible.builtin.command: >
-    /bin/cp "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}_dbconfig.xml"
-            "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}/dbconfig.xml"
-  become: true
+- name: Restore config files
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    remote_src: yes
+    mode: preserve
+  loop:
+    - { src: "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}_dbconfig.xml", dest: "{{ app_data_path }}/dbconfig.xml" }
+    - { src: "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}_eazybi.toml", dest: "{{ app_data_path }}/eazybi.toml" }
+    - { src: "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}_server.xml", dest: "{{ app_path }}/conf/server.xml" }
+    - { src: "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}_setenv.sh", dest: "{{ app_path }}/bin/setenv.sh" }
+  ignore_errors: true
 
-- name: Restore | eazybi.toml <- parent
-  ansible.builtin.command: >
-    /bin/cp "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}_eazybi.toml"
-            "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}/eazybi.toml"
-  become: true
+- name: Unpack appdata.tgz
+  unarchive:
+    src: "{{ upload_dir }}/{{ now }}_{{ instance }}_appdata.tgz"
+    dest: "{{ app_data_path }}"
+    remote_src: yes
+  ignore_errors: true
 
-- name: Ensure app_base instance dir exists
-  file:
-    path: "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}"
-    state: directory
-    mode: '0755'
-  become: true
+- name: Unpack homedir.tgz
+  unarchive:
+    src: "{{ upload_dir }}/{{ now }}_{{ instance }}_homedir.tgz"
+    dest: "{{ app_path }}"
+    remote_src: yes
+  ignore_errors: true
 
-- name: Restore | server.xml <- parent
-  ansible.builtin.command: >
-    /bin/cp "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}_server.xml"
-            "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}/conf/server.xml"
-  become: true
-
-- name: Restore | setenv.sh <- parent
-  ansible.builtin.command: >
-    /bin/cp "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}_setenv.sh"
-            "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}/bin/setenv.sh"
-  become: true
-
+#- name: Remove uploaded archive files
+#  file:
+#    path: "{{ item }}"
+#    state: absent
+#  loop:
+#    - "{{ upload_dir }}/{{ now }}_{{ instance }}_appdata.tgz"
+#    - "{{ upload_dir }}/{{ now }}_{{ instance }}_homedir.tgz"
+#  ignore_errors: true
