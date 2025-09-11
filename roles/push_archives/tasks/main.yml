@@ -1,11 +1,13 @@
 - name: Set SSH key path
   set_fact:
     ssh_key_path: "/tmp/ssh_key.pem"
+  become: false
 
 - name: Fail if SSH key is not defined
   fail:
     msg: "POLYGRAN_PRIVATE_KEY is not defined!"
   when: lookup('env', 'POLYGRAN_PRIVATE_KEY') | length == 0
+  become: false
 
 - name: Write private key to file (with mode 0600)
   copy:
@@ -14,16 +16,19 @@
     mode: '0600'
   delegate_to: "{{ inventory_hostname }}"
   no_log: true
+  become: false
 
 - name: Verify SSH key was created
   stat:
     path: "{{ ssh_key_path }}"
   delegate_to: "{{ inventory_hostname }}"
   register: ssh_key_stat
+  become: false
 
 - name: Debug SSH key info
   debug:
     msg: "SSH key exists: {{ ssh_key_stat.stat.exists }}, size: {{ ssh_key_stat.stat.size | default(0) }}"
+  become: false
 
 - name: Set SSH args to use private key
   set_fact:
@@ -31,6 +36,7 @@
       -o StrictHostKeyChecking=no
       -o UserKnownHostsFile=/dev/null
       -i {{ ssh_key_path | trim }}
+  become: false
 
 - name: Show fingerprint of the SSH key
   shell: "ssh-keygen -l -f {{ ssh_key_path }}"
@@ -38,19 +44,23 @@
   delegate_to: "{{ inventory_hostname }}"
   changed_when: false
   failed_when: false
+  become: false
 
 - debug:
     var: ssh_fingerprint.stdout
+  become: false
 
 
 - name: Set timestamp fallback
   set_fact:
     now: "{{ now | default(ansible_date_time.iso8601_basic[:8]) }}"
+  become: false
 
 - name: Ensure upload dir exists
   file:
     path: "{{ upload_dir }}"
     state: directory
+  become: false
 
 - name: Rsync archives from PROD to INT using SSH key
   ansible.posix.synchronize:
@@ -65,6 +75,7 @@
       - "--include={{ now }}_{{ instance }}.dump"
       - "--include={{ now }}_{{ instance }}_*.tgz"
       - "--exclude=*"
+  become: false
 
 - name: Clean up private key
   file:
@@ -72,3 +83,4 @@
     state: absent
   when: ssh_key_path is defined
   delegate_to: "{{ inventory_hostname }}"
+  become: false
