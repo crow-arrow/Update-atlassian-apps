@@ -75,6 +75,8 @@
       - "--include={{ now }}_{{ instance }}.dump"
       - "--include={{ now }}_{{ instance }}_*.tgz"
       - "--exclude=*"
+      - "--no-times"
+      - "--no-perms"
   delegate_to: "{{ inventory_hostname }}"
   become: false
 
