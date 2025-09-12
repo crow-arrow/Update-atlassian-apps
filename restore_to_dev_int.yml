@@ -9,7 +9,7 @@
     now: "{{ lookup('pipe', 'date +%Y%m%d') }}"
 
   vars_files:
-    - inventories/production/group_vars/vault.yml
+    - inventories/int/group_vars/vault.yml
 
   tasks:
 

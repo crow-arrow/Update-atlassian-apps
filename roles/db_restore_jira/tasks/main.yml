@@ -1,17 +1,21 @@
 ---
-- name: Restore PostgreSQL DB using Ansible module
-  community.postgresql.postgresql_db:
-    name: "{{ db_name }}"
-    state: restore
-    target: "{{ upload_dir }}/{{ now }}_{{ instance }}.dump"
-    login_host: "{{ db_host }}"
-    login_port: "{{ db_port | default(5432) }}"
-    login_user: "{{ db_user }}"
-    login_password: >-
-      {{ (app == 'jira') | ternary(jira_db_password, confluence_db_password) }}
-    encoding: UTF8
-    target_opts: "-c --if-exists"
-  register: restore_result
+- name: Restore PostgreSQL DB from dump
+  ansible.builtin.shell: >
+    psql --host="{{ db_host }}"
+         --port="{{ db_port | default(5432) }}"
+         --username="{{ db_user }}"
+         --dbname="{{ db_name }}"
+         --file="{{ upload_dir }}/{{ now }}_{{ instance }}.dump"
+         --echo-all
+         --set ON_ERROR_STOP=on
+         --set AUTOCOMMIT=off
+         -v "ON_ERROR_STOP=1"
+  environment:
+    PGPASSWORD: "{{ (app == 'jira') | ternary(jira_db_password, confluence_db_password) }}"
   become: true
   become_user: "{{ ENV_USER }}"
+  register: restore_result
+  changed_when: "'ERROR' not in restore_result.stderr"
+  failed_when: restore_result.rc != 0
   tags: restore
+
