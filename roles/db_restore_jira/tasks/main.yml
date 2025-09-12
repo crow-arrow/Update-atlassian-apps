@@ -1,5 +1,56 @@
 ---
-- name: Restore PostgreSQL DB securely from dump
+- name: Set clean_sql path based on {{ app }}
+  ansible.builtin.set_fact:
+    clean_sql: "/usr/local/{{ app }}/clean_table.sql"
+
+- name: Clean PostgreSQL DB using clean_table.sql
+  ansible.builtin.shell: >
+    psql
+    --host="{{ db_host }}"
+    --port="{{ db_port | default(5432) }}"
+    --username="{{ db_user }}"
+    --dbname="{{ db_name }}"
+    --file="{{ clean_sql }}"
+  environment:
+    PGPASSWORD: "{{ (app == 'jira') | ternary(jira_db_password, confluence_db_password) }}"
+  become: true
+  become_user: "{{ ENV_USER }}"
+  register: clean_result
+  changed_when: "'ERROR' not in clean_result.stderr"
+  failed_when: clean_result.rc != 0
+  tags: restore
+
+- name: Detect dump file format
+  ansible.builtin.shell: >
+    file "{{ upload_dir }}/{{ now }}_{{ instance }}.dump"
+  register: dump_format
+  changed_when: false
+
+- name: Set use_pg_restore flag
+  ansible.builtin.set_fact:
+    use_pg_restore: "{{ 'PostgreSQL custom' in dump_format.stdout }}"
+
+- name: Restore PostgreSQL DB {{ app }} using pg_restore (custom format)
+  ansible.builtin.shell: >
+    pg_restore
+    --host="{{ db_host }}"
+    --port="{{ db_port | default(5432) }}"
+    --username="{{ db_user }}"
+    --dbname="{{ db_name }}"
+    --clean
+    --if-exists
+    "{{ upload_dir }}/{{ now }}_{{ instance }}.dump"
+  environment:
+    PGPASSWORD: "{{ (app == 'jira') | ternary(jira_db_password, confluence_db_password) }}"
+  become: true
+  become_user: "{{ ENV_USER }}"
+  when: use_pg_restore
+  register: restore_result
+  changed_when: "'ERROR' not in restore_result.stderr"
+  failed_when: restore_result.rc != 0
+  tags: restore
+
+- name: Restore PostgreSQL DB {{ app }} using psql (plain SQL)
   ansible.builtin.shell: >
     psql
     --host="{{ db_host }}"
@@ -15,6 +66,7 @@
     PGPASSWORD: "{{ (app == 'jira') | ternary(jira_db_password, confluence_db_password) }}"
   become: true
   become_user: "{{ ENV_USER }}"
+  when: not use_pg_restore
   register: restore_result
   changed_when: "'ERROR' not in restore_result.stderr"
   failed_when: restore_result.rc != 0
