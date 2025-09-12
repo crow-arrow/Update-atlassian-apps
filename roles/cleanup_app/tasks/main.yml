@@ -6,28 +6,11 @@
   loop:
     - "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}"
     - "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}"
-  become: true
 
-- name: Find and delete all contents inside instance directories
-  vars:
-    instance_dirs:
-      - "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}"
-      - "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}"
-  block:
-    - name: Find all files and directories inside instance dir
-      find:
-        paths: "{{ item }}"
-        recurse: yes
-        file_type: any
-      register: found_items
-      loop: "{{ instance_dirs }}"
-      loop_control:
-        label: "{{ item }}"
-      become: true
-
-    - name: Remove all content inside instance dir (excluding instance dir itself)
-      file:
-        path: "{{ item.path }}"
-        state: absent
-      loop: "{{ found_items.results | map(attribute='files') | flatten }}"
-      become: true
+- name: Remove app and home directories
+  file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}"
+    - "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}"
