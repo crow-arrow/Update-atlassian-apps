@@ -28,19 +28,6 @@
     - "{{ app_data_path }}"
   become: true
 
-- name: Restore config files
-  copy:
-    src: "{{ item.src }}"
-    dest: "{{ item.dest }}"
-    remote_src: yes
-    mode: preserve
-  loop:
-    - { src: "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}_dbconfig.xml", dest: "{{ app_data_path }}/dbconfig.xml" }
-    - { src: "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}_eazybi.toml", dest: "{{ app_data_path }}/eazybi.toml" }
-    - { src: "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}_server.xml", dest: "{{ app_path }}/conf/server.xml" }
-    - { src: "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}_setenv.sh", dest: "{{ app_path }}/bin/setenv.sh" }
-  ignore_errors: true
-
 - name: Unpack appdata.tgz
   unarchive:
     src: "{{ upload_dir }}/{{ now }}_{{ instance }}_appdata.tgz"
@@ -53,6 +40,19 @@
     src: "{{ upload_dir }}/{{ now }}_{{ instance }}_homedir.tgz"
     dest: "{{ app_data_path }}"
     remote_src: yes
+  ignore_errors: true
+
+- name: Restore config files
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    remote_src: yes
+    mode: preserve
+  loop:
+    - { src: "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}_dbconfig.xml", dest: "{{ app_data_path }}/dbconfig.xml" }
+    - { src: "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}_eazybi.toml", dest: "{{ app_data_path }}/eazybi.toml" }
+    - { src: "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}_server.xml", dest: "{{ app_path }}/conf/server.xml" }
+    - { src: "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}_setenv.sh", dest: "{{ app_path }}/bin/setenv.sh" }
   ignore_errors: true
 
 #- name: Remove uploaded archive files
