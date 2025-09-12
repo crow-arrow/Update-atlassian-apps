@@ -19,4 +19,3 @@
   changed_when: "'ERROR' not in restore_result.stderr"
   failed_when: restore_result.rc != 0
   tags: restore
-  no_log: true
