@@ -25,11 +25,6 @@
   register: ssh_key_stat
   become: false
 
-- name: Debug SSH key info
-  debug:
-    msg: "SSH key exists: {{ ssh_key_stat.stat.exists }}, size: {{ ssh_key_stat.stat.size | default(0) }}"
-  become: false
-
 - name: Set SSH args to use private key
   set_fact:
     ansible_ssh_common_args: >-
@@ -37,19 +32,6 @@
       -o UserKnownHostsFile=/dev/null
       -i {{ ssh_key_path }}
   become: false
-
-- name: Show fingerprint of the SSH key
-  shell: "ssh-keygen -l -f {{ ssh_key_path }}"
-  register: ssh_fingerprint
-  delegate_to: "{{ inventory_hostname }}"
-  changed_when: false
-  failed_when: false
-  become: false
-
-- debug:
-    var: ssh_fingerprint.stdout
-  become: false
-
 
 - name: Set timestamp fallback
   set_fact:
@@ -61,13 +43,6 @@
     path: "{{ upload_dir }}"
     state: directory
   become: false
-
-- name: Show what rsync command will be executed
-  debug:
-    msg: >-
-      /usr/bin/rsync --archive --compress --rsh='ssh -i {{ ssh_key_path }} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
-      amalyuld@sndca00572p.polygran.noris.de:/var/atlassian/application-data/do_not_delete/
-      {{ upload_dir }}/
 
 - name: Rsync archives from PROD to INT using SSH key
   ansible.posix.synchronize:

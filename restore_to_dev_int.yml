@@ -1,5 +1,5 @@
 ---
-- name: Restore app to dev/int environment
+- name: Restore app to {{ env }} environment
   hosts: "{{ instance }}"
   become: true
   become_user: "{{ ENV_USER }}"
