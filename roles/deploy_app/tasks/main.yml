@@ -44,14 +44,14 @@
 - name: Unpack appdata.tgz
   unarchive:
     src: "{{ upload_dir }}/{{ now }}_{{ instance }}_appdata.tgz"
-    dest: "{{ app_data_path }}"
+    dest: "{{ app_path }}"
     remote_src: yes
   ignore_errors: true
 
 - name: Unpack homedir.tgz
   unarchive:
     src: "{{ upload_dir }}/{{ now }}_{{ instance }}_homedir.tgz"
-    dest: "{{ app_path }}"
+    dest: "{{ app_data_path }}"
     remote_src: yes
   ignore_errors: true
 
