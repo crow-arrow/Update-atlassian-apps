@@ -23,6 +23,11 @@
     path: "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}/bin/setenv.sh"
   register: setenv_stat
 
+- name: Check if jira-application.properties exists
+  stat:
+    path: "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}/atlassian-jira/WEB-INF/classes/jira-application.properties"
+  register: jira_app_properties_stat
+
 - name: Backup dbconfig.xml
   command: >
     cp -a "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}/dbconfig.xml"
@@ -37,6 +42,7 @@
   become: true
   when: eazybi_stat.stat.exists
 
+
 - name: Backup server.xml
   command: >
     cp -a "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}/conf/server.xml"
@@ -50,3 +56,10 @@
           "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}_setenv.sh"
   become: true
   when: setenv_stat.stat.exists
+
+- name: Backup jira-application.properties
+  command: >
+    cp -a "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}/atlassian-jira/WEB-INF/classes/jira-application.properties"
+          "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}_jira-application.properties.bak"
+  become: true
+  when: jira_app_properties_stat.stat.exists

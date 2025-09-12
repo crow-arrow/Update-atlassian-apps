@@ -25,6 +25,7 @@
     - "{{ app_path }}"
     - "{{ app_path }}/conf"
     - "{{ app_path }}/bin"
+    - "{{ app_path }}/atlassian-jira/WEB-INF/classes"
     - "{{ app_data_path }}"
   become: true
 
@@ -53,6 +54,7 @@
     - { src: "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}_eazybi.toml", dest: "{{ app_data_path }}/eazybi.toml" }
     - { src: "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}_server.xml", dest: "{{ app_path }}/conf/server.xml" }
     - { src: "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}_setenv.sh", dest: "{{ app_path }}/bin/setenv.sh" }
+    - { src: "{{ app_base }}/{{ app }}/{{ instance }}_jira-application.properties.bak", dest: "{{ app_path }}/atlassian-jira/WEB-INF/classes/jira-application.properties" }
   ignore_errors: true
 
 #- name: Remove uploaded archive files
