@@ -46,7 +46,7 @@
 
 - name: Rsync archives from PROD to INT using SSH key
   ansible.posix.synchronize:
-    src: "amalyuld@sndca00572p.polygran.noris.de:/var/atlassian/application-data/do_not_delete/"
+    src: "{{ USER }}@{{ ansible_host }}:/var/atlassian/application-data/do_not_delete/"
     dest: "{{ upload_dir }}/"
     mode: pull
     compress: true
