@@ -17,11 +17,21 @@
       ansible.builtin.set_fact:
         now: "{{ ansible_date_time.date | regex_replace('-', '') }}"
 
-    - name: Убедиться, что используемый пользователь — нужный
+    - name: Принудительно получить effective user
+      command: whoami
+      register: whoami_output
+      become: true
+      become_user: "{{ USER }}"
+
+    - name: Проверить кто выполняет задачу
+      debug:
+        msg: "Фактически используемый пользователь: {{ whoami_output.stdout }}"
+
+    - name: Проверить соответствие пользователю
       assert:
         that:
-          - ansible_effective_user == USER
-        fail_msg: "Неправильный пользователь: должен быть {{ USER }}"
+          - whoami_output.stdout == USER
+        fail_msg: "Ожидали пользователя {{ USER }}, но получили {{ whoami_output.stdout }}"
 
     - name: Stop application service
       import_role:
