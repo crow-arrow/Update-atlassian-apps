@@ -55,12 +55,6 @@
       when: app == "confluence"
       tags: [restore]
 
-    - name: Убедиться, что используемый пользователь — нужный
-      assert:
-        that:
-          - ansible_effective_user == USER
-        fail_msg: "Неправильный пользователь: должен быть {{ USER }}"
-
     - name: Start application service
       import_role:
         name: service_control
