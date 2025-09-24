@@ -10,6 +10,7 @@
     - "'int' in group_names"
   register: stop_result
   ignore_errors: false
+  become: false
 
 - name: Start service
   shell: "sudo /bin/systemctl start {{ SERVICE_NAME }}"
@@ -18,3 +19,4 @@
     - "'int' in group_names"
   register: start_result
   ignore_errors: false
+  become: false
