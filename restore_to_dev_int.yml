@@ -17,6 +17,12 @@
       ansible.builtin.set_fact:
         now: "{{ ansible_date_time.date | regex_replace('-', '') }}"
 
+    - name: Убедиться, что используемый пользователь — нужный
+      assert:
+        that:
+          - ansible_effective_user == USER
+        fail_msg: "Неправильный пользователь: должен быть {{ USER }}"
+
     - name: Stop application service
       import_role:
         name: service_control
