@@ -1,4 +1,25 @@
 ---
+- name: Set clean_sql path based on {{ app }}
+  ansible.builtin.set_fact:
+    clean_sql: "/usr/local/{{ app }}/clean_table.sql"
+
+- name: Clean PostgreSQL DB using clean_table.sql
+  ansible.builtin.shell: >
+    psql
+    --host="{{ db_host }}"
+    --port="{{ db_port | default(5432) }}"
+    --username="{{ db_user }}"
+    --dbname="{{ db_name }}"
+    --file="{{ clean_sql }}"
+  environment:
+    PGPASSWORD: "{{ (app == 'jira') | ternary(jira_db_password, confluence_db_password) }}"
+  become: true
+  become_user: "{{ ENV_USER }}"
+  register: clean_result
+  changed_when: "'ERROR' not in clean_result.stderr"
+  failed_when: clean_result.rc != 0
+  tags: restore
+
 - name: Detect dump file format
   ansible.builtin.shell: >
     file "{{ upload_dir }}/{{ now }}_{{ instance }}.dump"
