@@ -25,7 +25,7 @@
         name: snapshot_app
       tags: [snapshot]
 
-    - name: Fetch archives to AWX controller
-      import_role:
-        name: fetch_archives
-      tags: [fetch]
+    #- name: Fetch archives to AWX controller
+    #  import_role:
+    #    name: fetch_archives
+    #  tags: [fetch]

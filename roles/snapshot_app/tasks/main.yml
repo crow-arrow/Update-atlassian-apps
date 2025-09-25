@@ -15,19 +15,24 @@
   debug:
     msg: "Current user: {{ whoami_result.stdout }}"
 
-- name: Dump PostgreSQL DB using Ansible module
-  community.postgresql.postgresql_db:
-    name: "{{ db_name }}"
-    state: dump
-    target: "{{ snapshot_dir }}/{{ now }}_{{ instance }}.dump"
-    login_host: "{{ db_host }}"
-    login_port: "{{ db_port | default(5432) }}"
-    login_user: "{{ db_user }}"
-    login_password: >-
-      {{ (app == 'jira') | ternary(jira_db_password, confluence_db_password) }}
+- name: Dump PostgreSQL DB using pg_dump (custom format)
+  ansible.builtin.shell: >
+    pg_dump
+    --host="{{ db_host }}"
+    --port="{{ db_port | default(5432) }}"
+    --username="{{ db_user }}"
+    --format=custom
+    --no-owner
+    --no-acl
+    --file="{{ snapshot_dir }}/{{ now }}_{{ instance }}.dump"
+    "{{ db_name }}"
+  environment:
+    PGPASSWORD: "{{ (app == 'jira') | ternary(jira_db_password, confluence_db_password) }}"
   become: true
   become_user: "{{ ENV_USER }}"
-  no_log: true
+  register: pg_dump_result
+  changed_when: false
+  failed_when: pg_dump_result.rc != 0
 
 - name: Find first-level attachment subdirs (excluding 'insight')
   find:
