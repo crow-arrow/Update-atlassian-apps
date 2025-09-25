@@ -93,12 +93,12 @@
     "{{ upload_dir }}/{{ now }}_{{ instance }}.dump"
     --verbose
     --exit-on-error
-    --single-transaction
     --no-owner
     --no-privileges
     --disable-triggers
     --jobs=4
     --use-set-session-authorization
+    > /tmp/pg_restore.log 2>&1
   environment:
     PGPASSWORD: "{{ (app == 'jira') | ternary(jira_db_password, confluence_db_password) }}"
   become: true
@@ -106,12 +106,27 @@
   when: use_pg_restore
   register: restore_result
   changed_when: false
-  failed_when: >
-    restore_result.rc != 0
-    or (restore_result.stderr is not none and restore_result.stderr | regex_search('ERROR|FATAL|PANIC|ROLLBACK') is not none)
-    or (restore_result.stdout is not none and restore_result.stdout | regex_search('ERROR|FATAL|PANIC|ROLLBACK') is not none)
+  failed_when: restore_result.rc != 0
   tags: restore
 
-- name: Debug restore result
+- name: Analyze pg_restore log for real execution errors
+  ansible.builtin.shell: |
+    grep -E '^(pg_restore:|ERROR:|FATAL:|PANIC:|ROLLBACK)' /tmp/pg_restore.log || true
+  register: log_scan_result_pg
+  changed_when: false
+  failed_when: log_scan_result_pg.stdout is defined and log_scan_result_pg.stdout | trim != ""
+  when: use_pg_restore
+  tags: restore
+
+- name: Show last 40 lines of pg_restore log (custom format)
+  ansible.builtin.shell: tail -n 40 /tmp/pg_restore.log
+  register: restore_log_pg
+  changed_when: false
+  when: use_pg_restore
+  tags: restore
+
+- name: Show parsed restore log output (custom format)
   debug:
-    var: restore_result
+    var: restore_log_pg.stdout_lines
+  when: use_pg_restore
+  tags: restore
