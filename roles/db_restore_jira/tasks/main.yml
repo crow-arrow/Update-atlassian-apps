@@ -57,12 +57,12 @@
   failed_when: restore_result.rc != 0
   tags: restore
 
-- name: Analyze psql log for critical errors
+- name: Analyze psql log for real execution errors
   ansible.builtin.shell: |
-    grep -E 'ERROR|FATAL|PANIC|ROLLBACK' /tmp/psql_restore.log || true
+    grep -E '^(psql:|ERROR:|FATAL:|PANIC:|ROLLBACK)' /tmp/psql_restore.log || true
   register: log_scan_result
   changed_when: false
-  failed_when: log_scan_result.stdout != ""
+  failed_when: log_scan_result.stdout is defined and log_scan_result.stdout | trim != ""
   when: not use_pg_restore
   tags: restore
 
@@ -73,7 +73,8 @@
   when: not use_pg_restore
   tags: restore
 
-- debug:
+- name: Show parsed restore log output (plain SQL)
+  debug:
     var: restore_log.stdout_lines
   when: not use_pg_restore
   tags: restore
