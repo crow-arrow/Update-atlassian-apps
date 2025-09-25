@@ -1,25 +1,4 @@
 ---
-- name: Set clean_sql path based on {{ app }}
-  ansible.builtin.set_fact:
-    clean_sql: "/usr/local/{{ app }}/clean_table.sql"
-
-- name: Clean PostgreSQL DB using clean_table.sql
-  ansible.builtin.shell: >
-    psql
-    --host="{{ db_host }}"
-    --port="{{ db_port | default(5432) }}"
-    --username="{{ db_user }}"
-    --dbname="{{ db_name }}"
-    --file="{{ clean_sql }}"
-  environment:
-    PGPASSWORD: "{{ (app == 'jira') | ternary(jira_db_password, confluence_db_password) }}"
-  become: true
-  become_user: "{{ ENV_USER }}"
-  register: clean_result
-  changed_when: "'ERROR' not in clean_result.stderr"
-  failed_when: clean_result.rc != 0
-  tags: restore
-
 - name: Detect dump file format
   ansible.builtin.shell: >
     file "{{ upload_dir }}/{{ now }}_{{ instance }}.dump"
@@ -40,14 +19,25 @@
     --clean
     --if-exists
     "{{ upload_dir }}/{{ now }}_{{ instance }}.dump"
+    --verbose
+    --exit-on-error
+    --single-transaction
+    --no-owner
+    --no-privileges
+    --disable-triggers
+    --jobs=4
+    --use-set-session-authorization
   environment:
     PGPASSWORD: "{{ (app == 'jira') | ternary(jira_db_password, confluence_db_password) }}"
   become: true
   become_user: "{{ ENV_USER }}"
   when: use_pg_restore
   register: restore_result
-  changed_when: "'ERROR' not in restore_result.stderr"
-  failed_when: restore_result.rc != 0
+  changed_when: false
+  failed_when: >
+    restore_result.rc != 0
+    or (restore_result.stderr is search("ERROR|FATAL|PANIC|ROLLBACK"))
+    or (restore_result.stdout is search("ERROR|FATAL|PANIC|ROLLBACK"))
   tags: restore
 
 - name: Restore PostgreSQL DB {{ app }} using psql (plain SQL)
@@ -58,16 +48,25 @@
     --username="{{ db_user }}"
     --dbname="{{ db_name }}"
     --file="{{ upload_dir }}/{{ now }}_{{ instance }}.dump"
+    --echo-errors
     --echo-all
     --set ON_ERROR_STOP=on
     --set AUTOCOMMIT=off
     -v "ON_ERROR_STOP=1"
+    --log-file=/tmp/psql_restore.log
   environment:
     PGPASSWORD: "{{ (app == 'jira') | ternary(jira_db_password, confluence_db_password) }}"
   become: true
   become_user: "{{ ENV_USER }}"
   when: not use_pg_restore
   register: restore_result
-  changed_when: "'ERROR' not in restore_result.stderr"
-  failed_when: restore_result.rc != 0
+  changed_when: false
+  failed_when: >
+    restore_result.rc != 0
+    or (restore_result.stderr is search("ERROR|FATAL|PANIC|ROLLBACK"))
+    or (restore_result.stdout is search("ERROR|FATAL|PANIC|ROLLBACK"))
   tags: restore
+
+- name: Debug restore result
+  debug:
+    var: restore_result
