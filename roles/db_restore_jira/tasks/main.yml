@@ -86,6 +86,8 @@
     --port="{{ db_port | default(5432) }}"
     --username="{{ db_user }}"
     --dbname="{{ db_name }}"
+    --clean 
+    --if-exists
     "{{ upload_dir }}/{{ now }}_{{ instance }}.dump"
     --verbose
     --exit-on-error
