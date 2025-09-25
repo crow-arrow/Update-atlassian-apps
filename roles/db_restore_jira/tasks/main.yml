@@ -13,7 +13,6 @@
 - name: Set clean_sql path based on {{ app }}
   ansible.builtin.set_fact:
     clean_sql: "/usr/local/{{ app }}/clean_table.sql"
-  when: not use_pg_restore
 
 - name: Clean PostgreSQL DB using clean_table.sql (only for plain SQL dumps)
   ansible.builtin.shell: >
@@ -27,7 +26,6 @@
     PGPASSWORD: "{{ (app == 'jira') | ternary(jira_db_password, confluence_db_password) }}"
   become: true
   become_user: "{{ ENV_USER }}"
-  when: not use_pg_restore
   register: clean_result
   changed_when: "'ERROR' not in clean_result.stderr"
   failed_when: clean_result.rc != 0
@@ -88,7 +86,6 @@
     --port="{{ db_port | default(5432) }}"
     --username="{{ db_user }}"
     --dbname="{{ db_name }}"
-    --if-exists
     "{{ upload_dir }}/{{ now }}_{{ instance }}.dump"
     --verbose
     --exit-on-error
