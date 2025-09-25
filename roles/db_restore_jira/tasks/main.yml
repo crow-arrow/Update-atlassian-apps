@@ -9,12 +9,11 @@
   ansible.builtin.set_fact:
     use_pg_restore: "{{ 'PostgreSQL custom' in dump_format.stdout }}"
 
-# --- For plain SQL ---
 - name: Set clean_sql path based on {{ app }}
   ansible.builtin.set_fact:
     clean_sql: "/usr/local/{{ app }}/clean_table.sql"
 
-- name: Clean PostgreSQL DB using clean_table.sql (only for plain SQL dumps)
+- name: Clean PostgreSQL DB using clean_table.sql
   ansible.builtin.shell: >
     psql
     --host="{{ db_host }}"
@@ -31,6 +30,7 @@
   failed_when: clean_result.rc != 0
   tags: restore
 
+# --- For plain SQL ---
 - name: Restore PostgreSQL DB {{ app }} using psql (plain SQL)
   ansible.builtin.shell: >
     psql
@@ -107,7 +107,7 @@
 
 - name: Analyze pg_restore log for real execution errors
   ansible.builtin.shell: |
-    grep -E '^(pg_restore:|ERROR:|FATAL:|PANIC:|ROLLBACK)' /tmp/pg_restore.log || true
+    grep -E '^(ERROR:|FATAL:|PANIC:|ROLLBACK)' /tmp/pg_restore.log || true
   register: log_scan_result_pg
   changed_when: false
   failed_when: log_scan_result_pg.stdout is defined and log_scan_result_pg.stdout | trim != ""
