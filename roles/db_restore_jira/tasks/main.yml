@@ -56,8 +56,14 @@
   changed_when: false
   failed_when: >
     restore_result.rc != 0
-    or (restore_result.stderr is not none and restore_result.stderr | regex_search('ERROR|FATAL|PANIC|ROLLBACK') is not none)
-    or (restore_result.stdout is not none and restore_result.stdout | regex_search('ERROR|FATAL|PANIC|ROLLBACK') is not none)
+    or (
+      restore_result.stderr is defined
+      and (restore_result.stderr | regex_search('ERROR|FATAL|PANIC|ROLLBACK')) is not none
+    )
+    or (
+      restore_result.stdout is defined
+      and (restore_result.stdout | regex_search('ERROR|FATAL|PANIC|ROLLBACK')) is not none
+    )
   tags: restore
 
 - name: Show last 40 lines of restore log (plain SQL)
