@@ -1,6 +1,33 @@
 ---
-- name: Restore app to {{ env }} environment
+- name: Archive and transfer app snapshots from production
+  # hosts: "{{ app }}"
   hosts: "{{ instance }}"
+  become: true
+  become_user: "{{ ENV_USER }}"
+  gather_facts: true
+
+  vars_files:
+    - inventories/production/group_vars/pilot-aftersales/vault.yml
+
+  roles:
+    - common
+
+  pre_tasks:
+    - name: Validate survey var
+      ansible.builtin.assert:
+        that:
+          - app is defined
+          - app in ['jira', 'confluence']
+
+  tasks:
+
+    - name: Create application snapshot
+      import_role:
+        name: snapshot_app
+      tags: [snapshot]
+      
+- name: Restore app to {{ env }} environment
+  hosts: "{{ instance }}-{{ env }}"
   become: true
   become_user: "{{ ENV_USER }}"
   gather_facts: true
@@ -9,7 +36,7 @@
     now: "{{ lookup('pipe', 'date +%Y%m%d') }}"
 
   vars_files:
-    - inventories/int/group_vars/vault.yml
+    - "inventories/{{ env }}/group_vars/{{ instance }}/vault.yml"
 
   tasks:
 

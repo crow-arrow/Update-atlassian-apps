@@ -6,6 +6,17 @@
   set_fact:
     homedir_archive: "{{ snapshot_dir }}/{{ now }}_{{ instance }}_homedir.tgz"
 
+- name: Ensure snapshot and upload directories exist
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - "{{ upload_dir }}"
+    - "{{ snapshot_dir }}"
+  loop_control:
+    label: "{{ item }}"
+
 - name: Check current user on managed host
   ansible.builtin.command: whoami
   register: whoami_result
@@ -83,17 +94,15 @@
   register: attachments_dir_status
 
 - name: Set permissions on attachment directories (fast)
-  ansible.builtin.shell: >
-    find {{ application_data_home }}/data/attachments -type d -print0 |
-    xargs -0 chmod 0750
+  ansible.builtin.shell: |
+    find {{ application_data_home }}/data/attachments -type d -exec chmod 0750 {} +
   when: attachments_dir_status.stat.exists
   become: true
   become_user: "{{ ENV_USER }}"
 
-- name: Set permissions on attachment files (fast)
-  ansible.builtin.shell: >
-    find {{ application_data_home }}/data/attachments -type f -print0 |
-    xargs -0 chmod 0640
+- name: Set permissions on attachment files (safe)
+  ansible.builtin.shell: |
+    find {{ application_data_home }}/data/attachments -type f -exec chmod 0640 {} +
   when: attachments_dir_status.stat.exists
   become: true
   become_user: "{{ ENV_USER }}"
@@ -114,7 +123,7 @@
   find:
     paths: "{{ snapshot_dir }}"
     patterns: "{{ instance }}_*"
-    age: 365d
+    age: 1d
     recurse: no
   register: old_snapshots
 
