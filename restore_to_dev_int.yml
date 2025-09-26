@@ -9,9 +9,6 @@
   vars_files:
     - inventories/production/group_vars/pilot-aftersales/vault.yml
 
-  roles:
-    - common
-
   pre_tasks:
     - name: Validate survey var
       ansible.builtin.assert:
