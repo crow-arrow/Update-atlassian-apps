@@ -4,7 +4,6 @@ now: "{{ lookup('pipe','date +%Y%m%d') }}"
 
 app_base: /opt/atlassian
 app_data_base: /var/atlassian/application-data
-
 upload_dir: /var/atlassian/application-data/upload
 snapshot_dir: /var/atlassian/application-data/do_not_delete
 

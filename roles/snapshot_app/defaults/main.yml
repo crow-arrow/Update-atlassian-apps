@@ -1,1 +1,2 @@
 application_data_home: "/var/atlassian/application-data/{{ app }}"
+snapshot_expiry_age: "7d"

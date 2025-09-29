@@ -1,30 +1,16 @@
-- name: Set timestamp fact
-  set_fact:
-    now: "{{ ansible_date_time.date | regex_replace('-', '') }}"
-
 - name: Set homedir archive path
   set_fact:
     homedir_archive: "{{ snapshot_dir }}/{{ now }}_{{ instance }}_homedir.tgz"
 
 - name: Ensure snapshot and upload directories exist
   ansible.builtin.file:
-    path: "{{ item }}"
+    path: "{{ snapshot_dir }}"
     state: directory
     mode: '0755'
-  loop:
-    - "{{ upload_dir }}"
-    - "{{ snapshot_dir }}"
-  loop_control:
-    label: "{{ item }}"
-
-- name: Check current user on managed host
-  ansible.builtin.command: whoami
-  register: whoami_result
-  changed_when: false
-
-- name: Show executing user
-  debug:
-    msg: "Current user: {{ whoami_result.stdout }}"
+    owner: "{{ ENV_USER }}"
+    group: "{{ GROUP }}"
+  become: true
+  become_user: "{{ ENV_USER }}"
 
 - name: Dump PostgreSQL DB using pg_dump (custom format)
   ansible.builtin.shell: >
@@ -123,7 +109,7 @@
   find:
     paths: "{{ snapshot_dir }}"
     patterns: "{{ instance }}_*"
-    age: 1d
+    age: "{{ snapshot_expiry_age }}"
     recurse: no
   register: old_snapshots
 
