@@ -1,0 +1,12 @@
+ansible_host: sndca00578i.polygran.noris.de
+instance: pilot-aftersales
+app: jira
+source_instance_host: "pilot-aftersales.mercedes-benz.polygran.de"
+ENV_USER: jira
+db_name: gspopl_jira_int
+db_user: gspopl_jira_user
+db_host: sndcb00581i.polygran.noris.de
+db_pass: "{{ (app == 'jira') | ternSary(jira_db_password, confluence_db_password) }}"
+db_port: 5432
+DEV_SERVICE_NAME: dev-pilot-aftersales.service
+INT_SERVICE_NAME: pilot-aftersales.service

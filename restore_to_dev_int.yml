@@ -6,6 +6,9 @@
   become_user: "{{ ENV_USER }}"
   gather_facts: true
 
+  vars:
+    now: "{{ lookup('pipe', 'date +%Y%m%d') }}"
+
   vars_files:
     - inventories/production/group_vars/pilot-aftersales/vault.yml
 
