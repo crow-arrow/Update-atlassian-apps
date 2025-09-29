@@ -28,6 +28,16 @@
     path: "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}/atlassian-jira/WEB-INF/classes/jira-application.properties"
   register: jira_app_properties_stat
 
+- name: Check if secrets-config.yaml exists
+  stat:
+    path: "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}/secrets-config.yaml"
+  register: secrets_config_stat
+
+- name: Check if secured dir exists
+  stat:
+    path: "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}/secured"
+  register: secured_dir_stat
+
 - name: Backup dbconfig.xml
   command: >
     cp -a "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}/dbconfig.xml"
@@ -63,3 +73,17 @@
           "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}_jira-application.properties.bak"
   become: true
   when: jira_app_properties_stat.stat.exists
+
+- name: Backup secrets-config.yaml
+  command: >
+    cp -a "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}/secrets-config.yaml"
+          "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}_secrets-config.yaml"
+  become: true
+  when: secrets_config_stat.stat.exists
+
+- name: Backup secured directory
+  command: >
+    cp -a "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}/secured"
+          "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}_secured"
+  become: true
+  when: secured_dir_stat.stat.exists

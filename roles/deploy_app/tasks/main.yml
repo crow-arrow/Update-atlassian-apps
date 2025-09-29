@@ -55,6 +55,15 @@
     - { src: "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}_server.xml", dest: "{{ app_path }}/conf/server.xml" }
     - { src: "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}_setenv.sh", dest: "{{ app_path }}/bin/setenv.sh" }
     - { src: "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}_jira-application.properties.bak", dest: "{{ app_path }}/atlassian-jira/WEB-INF/classes/jira-application.properties" }
+    - { src: "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}_secrets-config.yaml", dest: "{{ app_data_path }}/secrets-config.yaml" }
+  ignore_errors: true
+
+- name: Restore secured directory
+  copy:
+    src: "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}_secured"
+    dest: "{{ app_data_path }}/secured"
+    remote_src: yes
+    mode: preserve
   ignore_errors: true
 
 - name: Remove uploaded archive files
@@ -64,4 +73,14 @@
   loop:
     - "{{ upload_dir }}/{{ now }}_{{ instance }}_appdata.tgz"
     - "{{ upload_dir }}/{{ now }}_{{ instance }}_homedir.tgz"
+  ignore_errors: true
+
+# --- cleanup secrets backups (important for security) ---
+- name: Remove secrets backup files
+  file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}_secrets-config.yaml"
+    - "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}_secured"
   ignore_errors: true
