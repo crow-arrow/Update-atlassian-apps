@@ -129,6 +129,26 @@
   when: use_pg_restore
   tags: restore
 
+- name: Update jira.baseurl in DB after restore
+  ansible.builtin.shell: >
+    psql
+    --host="{{ db_host }}"
+    --port="{{ db_port | default(5432) }}"
+    --username="{{ db_user }}"
+    --dbname="{{ db_name }}"
+    --command="
+      UPDATE propertystring
+      SET propertyvalue = '{{ jira_baseurl }}'
+      FROM propertyentry PE
+      WHERE PE.id = propertystring.id
+        AND PE.property_key = 'jira.baseurl';
+    "
+  environment:
+    PGPASSWORD: "{{ (app == 'jira') | ternary(jira_db_password, confluence_db_password) }}"
+  become: true
+  become_user: "{{ ENV_USER }}"
+  when: app == "jira"
+
 - name: Remove uploaded dump file
   file:
     path: "{{ upload_dir }}/{{ now }}_{{ instance }}.dump"
