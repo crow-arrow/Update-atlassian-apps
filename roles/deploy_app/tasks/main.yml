@@ -57,11 +57,11 @@
     - { src: "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}_jira-application.properties.bak", dest: "{{ app_path }}/atlassian-jira/WEB-INF/classes/jira-application.properties" }
   ignore_errors: true
 
-#- name: Remove uploaded archive files
-#  file:
-#    path: "{{ item }}"
-#    state: absent
-#  loop:
-#    - "{{ upload_dir }}/{{ now }}_{{ instance }}_appdata.tgz"
-#    - "{{ upload_dir }}/{{ now }}_{{ instance }}_homedir.tgz"
-#  ignore_errors: true
+- name: Remove uploaded archive files
+  file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - "{{ upload_dir }}/{{ now }}_{{ instance }}_appdata.tgz"
+    - "{{ upload_dir }}/{{ now }}_{{ instance }}_homedir.tgz"
+  ignore_errors: true

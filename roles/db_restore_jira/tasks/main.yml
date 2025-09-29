@@ -128,3 +128,9 @@
     var: restore_log_pg.stdout_lines
   when: use_pg_restore
   tags: restore
+
+- name: Remove uploaded dump file
+  file:
+    path: "{{ upload_dir }}/{{ now }}_{{ instance }}.dump"
+    state: absent
+  ignore_errors: true
