@@ -1,0 +1,5 @@
+- name: Install psycopg2-binary
+  ansible.builtin.pip:
+    name: psycopg2-binary
+    executable: pip3
+  become: true
