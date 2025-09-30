@@ -8,7 +8,7 @@
       -c "UPDATE pluginstate SET pluginenabled = 'false' WHERE pluginkey = '{{ item }}';"
   loop: "{{ plugins_to_disable }}"
   environment:
-    PGPASSWORD: "{{ db_password }}"
+    PGPASSWORD: "{{ (app == 'jira') | ternary(jira_db_password, confluence_db_password) }}"
   become: true
   become_user: "{{ ENV_USER }}"
   tags: [disable_plugins]
