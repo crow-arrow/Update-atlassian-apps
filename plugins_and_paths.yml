@@ -12,11 +12,6 @@
 
   tasks:
 
-    - name: Common role
-      import_role:
-        name: common
-      tags: [common]
-
     - name: Disable Jira plugins
       import_role:
         name: disable_plugins_jira

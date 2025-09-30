@@ -1,17 +1,14 @@
 - name: Disable plugins via SQL
-  community.postgresql.postgresql_query:
-    login_db: "{{ db_name }}"
-    login_host: "{{ db_host }}"
-    login_user: "{{ db_user }}"
-    login_password: "{{ (app == 'jira') | ternary(jira_db_password, confluence_db_password) }}"
-    login_port : "{{ db_port | default(5432) }}"
-    query: >
-      UPDATE pluginstate
-      SET pluginenabled = 'false'
-      WHERE pluginkey = '{{ item }}'
+  ansible.builtin.shell: |
+    PGPASSWORD="{{ db_password }}" psql \
+      --host={{ db_host }} \
+      --port={{ db_port | default(5432) }} \
+      --username={{ db_user }} \
+      --dbname={{ db_name }} \
+      -c "UPDATE pluginstate SET pluginenabled = 'false' WHERE pluginkey = '{{ item }}';"
   loop: "{{ plugins_to_disable }}"
-  when: env in ['int', 'dev']
-  register: disable_result
+  environment:
+    PGPASSWORD: "{{ db_password }}"
   become: true
   become_user: "{{ ENV_USER }}"
   tags: [disable_plugins]
