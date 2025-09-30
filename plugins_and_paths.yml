@@ -1,0 +1,23 @@
+- name: Restore app to {{ env }} environment
+  hosts: "{{ instance }}-{{ env }}"
+  become: true
+  become_user: "{{ ENV_USER }}"
+  gather_facts: true
+
+  vars:
+    now: "{{ lookup('pipe', 'date +%Y%m%d') }}"
+
+  vars_files:
+    - "inventories/{{ env }}/group_vars/{{ instance }}/vault.yml"
+
+  tasks:
+
+    - name: Disable Jira plugins
+      import_role:
+        name: disable_plugins_jira
+      tags: [disable_plugins]
+
+    - name: Backup current config before deployment
+      import_role:
+        name: backup_config
+      tags: [backup]

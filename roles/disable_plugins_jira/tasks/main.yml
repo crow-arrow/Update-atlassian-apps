@@ -1,0 +1,17 @@
+- name: Disable plugins via SQL
+  community.postgresql.postgresql_query:
+    db: "{{ db_name }}"
+    login_host: "{{ db_host }}"
+    login_user: "{{ db_user }}"
+    login_password: "{{ (app == 'jira') | ternary(jira_db_password, confluence_db_password) }}"
+    port: "{{ db_port | default(5432) }}"
+    query: >
+      UPDATE pluginstate
+      SET pluginenabled = 'false'
+      WHERE pluginkey = '{{ item }}'
+  loop: "{{ plugins_to_disable }}"
+  when: env in ['int', 'dev']
+  register: disable_result
+  become: true
+  become_user: "{{ ENV_USER }}"
+  tags: [disable_plugins]
