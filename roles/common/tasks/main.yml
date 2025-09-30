@@ -3,3 +3,4 @@
     name: psycopg2-binary
     executable: pip3
   become: true
+  become_user: "{{ ENV_USER }}"
