@@ -1,6 +1,6 @@
 - name: Set banner date
   ansible.builtin.set_fact:
-    banner_date: "{{ lookup('pipe', 'date +%d %b. %Y') }}"
+    banner_date: "{{ lookup('pipe', \"date +'%d %b. %Y'\") }}"
 
 - name: Render banner HTML from template
   ansible.builtin.set_fact:
