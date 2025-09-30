@@ -20,6 +20,6 @@
            SET propertyvalue = '{{ banner_html }}'
            WHERE id = (SELECT id FROM propertyentry WHERE property_key = 'jira.alertheader');"
   environment:
-    PGPASSWORD: "{{ db_password }}"
+    PGPASSWORD: "{{ (app == 'jira') | ternary(jira_db_password, confluence_db_password) }}"
   become: true
   become_user: "{{ ENV_USER }}"
