@@ -1,6 +1,6 @@
 - name: Disable plugins via SQL
   ansible.builtin.shell: |
-    PGPASSWORD="{{ db_password }}" psql \
+    psql \
       --host={{ db_host }} \
       --port={{ db_port | default(5432) }} \
       --username={{ db_user }} \
