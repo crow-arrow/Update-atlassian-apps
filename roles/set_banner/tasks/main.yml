@@ -1,0 +1,25 @@
+- name: Set banner date
+  ansible.builtin.set_fact:
+    banner_date: "{{ lookup('pipe', 'date +%d %b. %Y') }}"
+
+- name: Render banner HTML from template
+  ansible.builtin.set_fact:
+    banner_html: "{{ lookup('template', 'templates/banner.html.j2')
+                    | replace('\n', ' ')
+                    | replace(\"'\", \"''\")
+                    | replace('\"','\\\"') }}"
+
+- name: Upload JIRA banner to database
+  ansible.builtin.shell: |
+    psql \
+      --host={{ db_host }} \
+      --port={{ db_port | default(5432) }} \
+      --username={{ db_user }} \
+      --dbname={{ db_name }} \
+      -c "UPDATE propertytext
+           SET propertyvalue = '{{ banner_html }}'
+           WHERE id = (SELECT id FROM propertyentry WHERE property_key = 'jira.alertheader');"
+  environment:
+    PGPASSWORD: "{{ db_password }}"
+  become: true
+  become_user: "{{ ENV_USER }}"

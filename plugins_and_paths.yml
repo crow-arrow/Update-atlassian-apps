@@ -17,7 +17,7 @@
         name: disable_plugins_jira
       tags: [disable_plugins]
 
-    - name: Backup current config before deployment
+    - name: Set banner
       import_role:
-        name: backup_config
-      tags: [backup]
+        name: set_banner
+      tags: [set_banner]
