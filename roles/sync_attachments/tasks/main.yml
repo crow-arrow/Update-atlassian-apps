@@ -19,6 +19,7 @@
     mode: '0600'
   no_log: true
   become: false
+  delegate_to: "{{ inventory_hostname }}"
   tags: [sync_attachments]
 
 - name: Ensure target attachments directory exists
@@ -72,4 +73,5 @@
     path: "{{ ssh_key_path }}"
     state: absent
   become: false
+  delegate_to: "{{ inventory_hostname }}"
   tags: [sync_attachments]
