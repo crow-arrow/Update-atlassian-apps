@@ -50,8 +50,7 @@
       -o UserKnownHostsFile=/dev/null
       -i {{ ssh_key_path }}
   delegate_to: "{{ inventory_hostname }}"
-  become: true
-  become_user: "{{ ENV_USER }}"
+  become: false
   tags: [sync_attachments]
 
 - name: Fix directory permissions
