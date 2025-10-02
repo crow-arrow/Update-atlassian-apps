@@ -82,6 +82,28 @@
       when: app == "confluence"
       tags: [restore]
 
+    - name: Disable Jira plugins
+      import_role:
+        name: disable_plugins_jira
+      when: app == "jira"
+      tags: [disable_plugins]
+
+    - name: Remove *mbb-permission-manager* Plugin
+      import_role:
+        name: remove_plugins_jira
+      when: app == "jira" and instance == "mbb-jira"
+      tags: [mbb-permission-manager]
+      
+    - name: Set base URL
+      import_role:
+        name: set_base_url
+      tags: [set_base_url]
+
+    - name: Set banner
+      import_role:
+        name: set_banner
+      tags: [set_banner]
+
     - name: Start application service
       import_role:
         name: service_control

@@ -21,3 +21,9 @@
       import_role:
         name: set_banner
       tags: [set_banner]
+
+    - name: Sync attachments
+      import_role:
+        name: sync_attachments
+      when: INCLUDE_ATTACHMENTS | default(false) | bool
+      tags: [sync_attachments]

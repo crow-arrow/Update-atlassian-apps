@@ -2,28 +2,23 @@
   set_fact:
     ssh_key_path: "/tmp/ssh_key.pem"
   become: false
+  tags: [push]
 
 - name: Fail if SSH key is not defined
   fail:
     msg: "POLYGRAN_PRIVATE_KEY is not defined!"
   when: lookup('env', 'POLYGRAN_PRIVATE_KEY') | length == 0
   become: false
+  tags: [push]
 
 - name: Write private key to file (with mode 0600)
   copy:
     content: "{{ lookup('env', 'POLYGRAN_PRIVATE_KEY') }}"
     dest: "{{ ssh_key_path }}"
     mode: '0600'
-  delegate_to: "{{ inventory_hostname }}"
   no_log: true
   become: false
-
-- name: Verify SSH key was created
-  stat:
-    path: "{{ ssh_key_path }}"
-  delegate_to: "{{ inventory_hostname }}"
-  register: ssh_key_stat
-  become: false
+  tags: [push]
 
 - name: Set SSH args to use private key
   set_fact:
@@ -32,21 +27,18 @@
       -o UserKnownHostsFile=/dev/null
       -i {{ ssh_key_path }}
   become: false
-
-- name: Set timestamp fallback
-  set_fact:
-    now: "{{ now | default(ansible_date_time.iso8601_basic[:8]) }}"
-  become: false
+  tags: [push]
 
 - name: Ensure upload dir exists
   file:
     path: "{{ upload_dir }}"
     state: directory
   become: false
+  tags: [push]
 
-- name: Rsync archives from PROD to INT using SSH key
+- name: Rsync archives from PROD to {{ env }} using SSH key
   ansible.posix.synchronize:
-    src: "{{ USER }}@{{ remote_host }}:/var/atlassian/application-data/do_not_delete/"
+    src: "{{ USER }}@{{ remote_host }}:{{ snapshot_dir }}/"
     dest: "{{ upload_dir }}/"
     mode: pull
     compress: true
@@ -62,18 +54,12 @@
       - "--exclude=*"
       - "--no-times"
       - "--no-perms"
-  delegate_to: "{{ inventory_hostname }}"
-  vars:
-    ansible_ssh_common_args: >-
-      -o StrictHostKeyChecking=no
-      -o UserKnownHostsFile=/dev/null
-      -i /tmp/ssh_key.pem
   become: false
+  tags: [push]
 
 - name: Clean up private key
   file:
     path: "{{ ssh_key_path }}"
     state: absent
-  when: ssh_key_path is defined
-  delegate_to: "{{ inventory_hostname }}"
   become: false
+  tags: [push]

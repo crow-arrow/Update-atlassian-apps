@@ -4,14 +4,17 @@
     file "{{ upload_dir }}/{{ now }}_{{ instance }}.dump"
   register: dump_format
   changed_when: false
+  tags: [restore]
 
 - name: Set use_pg_restore flag
   ansible.builtin.set_fact:
     use_pg_restore: "{{ 'PostgreSQL custom' in dump_format.stdout }}"
+  tags: [restore]
 
 - name: Set clean_sql path based on {{ app }}
   ansible.builtin.set_fact:
     clean_sql: "/usr/local/{{ app }}/clean_table.sql"
+  tags: [restore]
 
 - name: Clean PostgreSQL DB using clean_table.sql
   ansible.builtin.shell: >
@@ -28,7 +31,7 @@
   register: clean_result
   changed_when: "'ERROR' not in clean_result.stderr"
   failed_when: clean_result.rc != 0
-  tags: restore
+  tags: [restore]
 
 # --- For plain SQL ---
 - name: Restore PostgreSQL DB {{ app }} using psql (plain SQL)
@@ -53,7 +56,7 @@
   register: restore_result
   changed_when: false
   failed_when: restore_result.rc != 0
-  tags: restore
+  tags: [restore]
 
 - name: Analyze psql log for real execution errors
   ansible.builtin.shell: |
@@ -62,21 +65,7 @@
   changed_when: false
   failed_when: log_scan_result.stdout is defined and log_scan_result.stdout | trim != ""
   when: not use_pg_restore
-  tags: restore
-
-- name: Show last 40 lines of restore log (plain SQL)
-  ansible.builtin.shell: tail -n 40 /tmp/psql_restore.log
-  register: restore_log
-  changed_when: false
-  when: not use_pg_restore
-  tags: restore
-
-- name: Show parsed restore log output (plain SQL)
-  debug:
-    var: restore_log.stdout_lines
-  when: not use_pg_restore
-  tags: restore
-
+  tags: [restore]
 
 # --- For custom dump ---
 - name: Restore PostgreSQL DB {{ app }} using pg_restore (custom format)
@@ -105,7 +94,7 @@
   register: restore_result
   changed_when: false
   failed_when: restore_result.rc != 0
-  tags: restore
+  tags: [restore]
 
 - name: Analyze pg_restore log for real execution errors
   ansible.builtin.shell: |
@@ -114,43 +103,11 @@
   changed_when: false
   failed_when: log_scan_result_pg.stdout is defined and log_scan_result_pg.stdout | trim != ""
   when: use_pg_restore
-  tags: restore
-
-- name: Show last 40 lines of pg_restore log (custom format)
-  ansible.builtin.shell: tail -n 40 /tmp/pg_restore.log
-  register: restore_log_pg
-  changed_when: false
-  when: use_pg_restore
-  tags: restore
-
-- name: Show parsed restore log output (custom format)
-  debug:
-    var: restore_log_pg.stdout_lines
-  when: use_pg_restore
-  tags: restore
-
-- name: Update jira.baseurl in DB after restore
-  ansible.builtin.shell: >
-    psql
-    --host="{{ db_host }}"
-    --port="{{ db_port | default(5432) }}"
-    --username="{{ db_user }}"
-    --dbname="{{ db_name }}"
-    --command="
-      UPDATE propertystring
-      SET propertyvalue = '{{ jira_baseurl }}'
-      FROM propertyentry PE
-      WHERE PE.id = propertystring.id
-        AND PE.property_key = 'jira.baseurl';
-    "
-  environment:
-    PGPASSWORD: "{{ (app == 'jira') | ternary(jira_db_password, confluence_db_password) }}"
-  become: true
-  become_user: "{{ ENV_USER }}"
-  when: app == "jira"
+  tags: [restore]
 
 - name: Remove uploaded dump file
   file:
     path: "{{ upload_dir }}/{{ now }}_{{ instance }}.dump"
     state: absent
   ignore_errors: true
+  tags: [restore]

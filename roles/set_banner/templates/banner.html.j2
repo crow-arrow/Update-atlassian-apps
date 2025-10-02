@@ -1,6 +1,11 @@
 <!-- Message Banner -->
 <div style="background-color: #FDD0A2; border: 2px solid #B61F34; border-radius: 10px; padding: 10px; font-family: 'Lato'; font-weight: bold; font-size: 13px; text-align: left; color: #162259;">
-Test environment: <a href="https://{{ instance }}.mercedes-benz.polygran.de/">{{ instance }}</a><br>
+
+{% if instance == "dedicated-itgm-jira" %}
+<p style="text-align:center;"><font color="#B61F34">[This system contains confidential data]</font></p>
+{% endif %}
+
+Test environment: <a href="https://{{ instance }}.{{ domain }}/">{{ instance }}</a><br>
 Data Set: {{ banner_date }}<br>
 <font color="#B61F34">Do not store any productive data at this place</font>
 </div>

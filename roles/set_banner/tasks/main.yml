@@ -9,7 +9,7 @@
                     | replace(\"'\", \"''\")
                     | replace('\"','\\\"') }}"
 
-- name: Upload JIRA banner to database
+- name: Upload JIRA banner HTML
   ansible.builtin.shell: |
     psql \
       --host={{ db_host }} \
@@ -19,6 +19,21 @@
       -c "UPDATE propertytext
            SET propertyvalue = '{{ banner_html }}'
            WHERE id = (SELECT id FROM propertyentry WHERE property_key = 'jira.alertheader');"
+  environment:
+    PGPASSWORD: "{{ (app == 'jira') | ternary(jira_db_password, confluence_db_password) }}"
+  become: true
+  become_user: "{{ ENV_USER }}"
+
+- name: Set JIRA banner visibility
+  ansible.builtin.shell: |
+    psql \
+      --host={{ db_host }} \
+      --port={{ db_port | default(5432) }} \
+      --username={{ db_user }} \
+      --dbname={{ db_name }} \
+      -c "UPDATE propertystring
+           SET propertyvalue = 'public'
+           WHERE id = (SELECT id FROM propertyentry WHERE property_key = 'jira.alertheader.visibility');"
   environment:
     PGPASSWORD: "{{ (app == 'jira') | ternary(jira_db_password, confluence_db_password) }}"
   become: true

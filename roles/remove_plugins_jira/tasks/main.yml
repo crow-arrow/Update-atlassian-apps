@@ -1,0 +1,15 @@
+- name: Remove MBB Permission Manager plugin files
+  ansible.builtin.find:
+    paths: "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}/plugins/installed-plugins"
+    patterns: "*mbb-permission-manager*"
+    file_type: file
+  register: mbb_plugin_files
+  tags: [mbb-permission-manager]
+
+- name: Delete MBB Permission Manager plugin files
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: absent
+  loop: "{{ mbb_plugin_files.files }}"
+  when: mbb_plugin_files.matched > 0
+  tags: [mbb-permission-manager]

@@ -1,0 +1,45 @@
+---
+- name: Ensure target attachments directory exists
+  ansible.builtin.file:
+    path: "{{ application_data_home }}/data/attachments"
+    state: directory
+    owner: "{{ ENV_USER }}"
+    group: "{{ GROUP }}"
+    mode: '0750'
+  become: true
+  become_user: "{{ ENV_USER }}"
+
+- name: Sync Jira attachments from PROD
+  ansible.posix.synchronize:
+    src: "{{ USER }}@{{ remote_host }}:{{ snapshot_dir }}/"
+    dest: "{{ application_data_home }}/data/attachments/"
+    mode: pull
+    compress: true
+    recursive: true
+    links: true
+    times: true
+    perms: true
+    rsync_path: "rsync"
+    use_ssh_args: true
+  vars:
+    ansible_ssh_common_args: >-
+      -o StrictHostKeyChecking=no
+      -o UserKnownHostsFile=/dev/null
+      -i {{ ssh_key_path }}
+  become: true
+  become_user: "{{ ENV_USER }}"
+  tags: [sync_attachments]
+
+- name: Fix directory permissions
+  ansible.builtin.shell: |
+    find {{ application_data_home }}/data/attachments -type d -exec chmod 0750 {} +
+  become: true
+  become_user: "{{ ENV_USER }}"
+  tags: [sync_attachments]
+
+- name: Fix file permissions
+  ansible.builtin.shell: |
+    find {{ application_data_home }}/data/attachments -type f -exec chmod 0640 {} +
+  become: true
+  become_user: "{{ ENV_USER }}"
+  tags: [sync_attachments]

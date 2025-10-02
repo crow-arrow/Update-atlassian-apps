@@ -2,41 +2,49 @@
   stat:
     path: "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}"
   register: instance_dir
+  tags: [backup]
 
 - name: Check if dbconfig.xml exists
   stat:
     path: "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}/dbconfig.xml"
   register: dbconfig_stat
+  tags: [backup]
 
 - name: Check if eazybi.toml exists
   stat:
     path: "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}/eazybi.toml"
   register: eazybi_stat
+  tags: [backup]
 
 - name: Check if server.xml exists
   stat:
     path: "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}/conf/server.xml"
   register: server_stat
+  tags: [backup]
 
 - name: Check if setenv.sh exists
   stat:
     path: "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}/bin/setenv.sh"
   register: setenv_stat
+  tags: [backup]
 
 - name: Check if jira-application.properties exists
   stat:
     path: "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}/atlassian-jira/WEB-INF/classes/jira-application.properties"
   register: jira_app_properties_stat
+  tags: [backup]
 
 - name: Check if secrets-config.yaml exists
   stat:
     path: "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}/secrets-config.yaml"
   register: secrets_config_stat
+  tags: [backup]
 
 - name: Check if secured dir exists
   stat:
     path: "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}/secured"
   register: secured_dir_stat
+  tags: [backup]
 
 - name: Backup dbconfig.xml
   command: >
@@ -44,6 +52,7 @@
           "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}_dbconfig.xml"
   become: true
   when: dbconfig_stat.stat.exists
+  tags: [backup]
 
 - name: Backup eazybi.toml
   command: >
@@ -51,7 +60,7 @@
           "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}_eazybi.toml"
   become: true
   when: eazybi_stat.stat.exists
-
+  tags: [backup]
 
 - name: Backup server.xml
   command: >
@@ -59,6 +68,7 @@
           "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}_server.xml"
   become: true
   when: server_stat.stat.exists
+  tags: [backup]
 
 - name: Backup setenv.sh
   command: >
@@ -66,6 +76,7 @@
           "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}_setenv.sh"
   become: true
   when: setenv_stat.stat.exists
+  tags: [backup]
 
 - name: Backup jira-application.properties
   command: >
@@ -73,6 +84,7 @@
           "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}_jira-application.properties.bak"
   become: true
   when: jira_app_properties_stat.stat.exists
+  tags: [backup]
 
 - name: Backup secrets-config.yaml
   command: >
@@ -80,6 +92,7 @@
           "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}_secrets-config.yaml"
   become: true
   when: secrets_config_stat.stat.exists
+  tags: [backup]
 
 - name: Backup secured directory
   command: >
@@ -87,3 +100,4 @@
           "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}_secured"
   become: true
   when: secured_dir_stat.stat.exists
+  tags: [backup]

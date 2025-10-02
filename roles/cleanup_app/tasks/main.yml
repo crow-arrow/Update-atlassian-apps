@@ -6,6 +6,7 @@
   loop:
     - "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}"
     - "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}"
+  tags: [cleanup]
 
 - name: Remove app and home directories
   file:
@@ -14,3 +15,4 @@
   loop:
     - "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}"
     - "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}"
+  tags: [cleanup]
