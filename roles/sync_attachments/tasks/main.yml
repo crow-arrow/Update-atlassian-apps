@@ -3,14 +3,14 @@
   set_fact:
     ssh_key_path: "/tmp/ssh_key.pem"
   become: false
-  tags: [push]
+  tags: [sync_attachments]
 
 - name: Fail if SSH key is not defined
   fail:
     msg: "POLYGRAN_PRIVATE_KEY is not defined!"
   when: lookup('env', 'POLYGRAN_PRIVATE_KEY') | length == 0
   become: false
-  tags: [push]
+  tags: [sync_attachments]
 
 - name: Write private key to file (with mode 0600)
   copy:
@@ -19,7 +19,7 @@
     mode: '0600'
   no_log: true
   become: false
-  tags: [push]
+  tags: [sync_attachments]
 
 - name: Ensure target attachments directory exists
   ansible.builtin.file:
@@ -28,8 +28,7 @@
     owner: "{{ ENV_USER }}"
     group: "{{ GROUP }}"
     mode: '0750'
-  become: true
-  become_user: "{{ ENV_USER }}"
+  become: false
   tags: [sync_attachments]
 
 - name: Sync Jira attachments from PROD
@@ -49,6 +48,7 @@
       -o StrictHostKeyChecking=no
       -o UserKnownHostsFile=/dev/null
       -i {{ ssh_key_path }}
+  delegate_to: "{{ inventory_hostname }}"
   become: true
   become_user: "{{ ENV_USER }}"
   tags: [sync_attachments]
@@ -65,4 +65,11 @@
     find {{ INT_ATTACHMENTS_DIR }}/ -type f -exec chmod 0640 {} +
   become: true
   become_user: "{{ ENV_USER }}"
+  tags: [sync_attachments]
+
+- name: Clean up private key
+  file:
+    path: "{{ ssh_key_path }}"
+    state: absent
+  become: false
   tags: [sync_attachments]
