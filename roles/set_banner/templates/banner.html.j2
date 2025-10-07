@@ -1,11 +1,134 @@
-<!-- Message Banner -->
-<div style="background-color: #FDD0A2; border: 2px solid #B61F34; border-radius: 10px; padding: 10px; font-family: 'Lato'; font-weight: bold; font-size: 13px; text-align: left; color: #162259;">
+<div style="
+  position: relative;
+  background: linear-gradient(135deg, #1b2d1f 20%, #000000 60%, #228848 100%);
+  border-radius: 20px;
+  padding: 40px 50px;
+  font-family: 'Lato', Arial, sans-serif;
+  color: #ffffff;
+  max-width: 900px;
+  margin: 40px auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  backdrop-filter: blur(16px) saturate(160%) contrast(120%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%) contrast(120%);
+  border: 1px solid rgba(139, 247, 113, 0.25);
+  box-shadow:
+    0 0 30px rgba(34, 136, 72, 0.25),
+    inset 0 0 40px rgba(34, 136, 72, 0.15),
+    inset 0 0 80px rgba(139, 247, 113, 0.07);
+">
 
-{% if instance == "dedicated-itgm-jira" %}
-<p style="text-align:center;"><font color="#B61F34">[This system contains confidential data]</font></p>
-{% endif %}
+  <!-- === ГЛОУ ЭФФЕКТЫ ПО УГЛАМ (имитация подсветки) === -->
+  <div style="
+    position: absolute;
+    top: -10%;
+    left: -10%;
+    width: 60%;
+    height: 60%;
+    background: radial-gradient(circle at top left, rgba(139, 247, 113, 0.25), transparent 100%);
+    filter: blur(45px);
+    pointer-events: none;
+  "></div>
 
-Test environment: <a href="https://{{ instance }}.{{ domain }}/">{{ instance }}</a><br>
-Data Set: {{ banner_date }}<br>
-<font color="#B61F34">Do not store any productive data at this place</font>
+  <div style="
+    position: absolute;
+    bottom: -25%;
+    right: -5%;
+    width: 60%;
+    height: 60%;
+    background: radial-gradient(circle at bottom right, rgba(34, 136, 72, 0.75), transparent 100%);
+    filter: blur(55px);
+    pointer-events: none;
+  "></div>
+
+  <!-- === ГРАДИЕНТНАЯ РАМКА === -->
+  <div style="
+    position: absolute;
+    inset: 0;
+    border-radius: 20px;
+    padding: 2px;
+    background: linear-gradient(135deg, #000, #228848);
+    background-clip: content-box, border-box;
+    mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    -webkit-mask-composite: xor;
+    filter: blur(0.5px);
+    opacity: 0.8;
+    pointer-events: none;
+    z-index: 0;
+  "></div>
+
+  <!-- === ЛЕВАЯ КОЛОНКА === -->
+  <div style="display: flex; flex-direction: column; gap: 18px; position: relative; z-index: 1;">
+    <div style="
+      font-size: 15px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #8bf771;
+    ">
+      Test Environment
+    </div>
+
+    <div style="
+      font-size: 38px;
+      font-weight: 700;
+      line-height: 1.2;
+      color: #ffffff;
+      text-shadow: 0 0 18px rgba(34, 136, 72, 0.5);
+    ">
+      {{ instance }}
+    </div>
+
+    <div style="
+      font-size: 18px;
+      color: #8bf771;
+    ">
+      Data Set: {{ banner_date }}
+    </div>
+
+    <div style="margin-top: 16px;">
+      <a href="https://{{ instance }}.{{ domain }}/" style="
+        background: #8bf771;
+        color: #000000;
+        text-decoration: none;
+        font-weight: 700;
+        border-radius: 50px;
+        padding: 12px 26px;
+        box-shadow: 0 0 18px #8bf77166;
+        transition: all 0.3s ease;
+      " onmouseover="this.style.boxShadow='0 0 30px #8bf771aa';" onmouseout="this.style.boxShadow='0 0 18px #8bf77166';">
+        Open Environment →
+      </a>
+    </div>
+
+    <div style="font-size: 14px; opacity: 0.8;">
+      Do not store productive data
+    </div>
+  </div>
+
+  <!-- === ПРАВАЯ КОЛОНКА === -->
+  <div style="display: flex; flex-direction: column; gap: 20px; align-items: start; justify-content: center; position: relative; z-index: 1;">
+    {% if instance == "dedicated-itgm-jira" %}
+    <div style="
+      background: linear-gradient(90deg, rgba(34,136,72,0.4) 0%, rgba(139,247,113,0.25) 100%);
+      border: 1px solid rgba(139,247,113,0.4);
+      color: #8bf771;
+      padding: 14px 18px;
+      border-radius: 10px;
+      font-weight: 500;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      text-align: center;
+      box-shadow: 0 0 12px rgba(34,136,72,0.5);
+    ">
+      ⚠️ This system contains confidential data
+    </div>
+    {% endif %}
+  </div>
 </div>
