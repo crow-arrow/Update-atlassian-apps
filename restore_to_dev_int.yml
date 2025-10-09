@@ -10,14 +10,26 @@
     now: "{{ lookup('pipe', 'date +%Y%m%d') }}"
 
   vars_files:
-    - inventories/production/group_vars/pilot-aftersales/vault.yml
+    - inventories/production/group_vars/{{ instance }}/vault.yml
 
   pre_tasks:
-    - name: Validate survey var
-      ansible.builtin.assert:
-        that:
-          - app is defined
-          - app in ['jira', 'confluence']
+  - name: Validate critical vars for snapshot_app role
+    assert:
+      that:
+        - app is defined
+        - app in ['jira', 'confluence']
+        - instance is defined
+        - snapshot_dir is defined
+        - ENV_USER is defined
+        - GROUP is defined
+        - application_data_home is defined
+        - db_host is defined
+        - db_user is defined
+        - db_name is defined
+        - (app == 'jira' and jira_db_password is defined) or (app == 'confluence' and confluence_db_password is defined)
+        - app_base is defined
+        - snapshot_expiry_age is defined
+    fail_msg: "Missing or invalid required variable(s) for snapshot_app role"
 
   tasks:
 
@@ -37,6 +49,18 @@
 
   vars_files:
     - "inventories/{{ env }}/group_vars/{{ instance }}/vault.yml"
+
+  pre_tasks:
+  - name: Validate restore input vars
+    assert:
+      that:
+        - app is defined
+        - app in ['jira', 'confluence']
+        - instance is defined
+        - env is defined
+        - ENV_USER is defined
+        - INCLUDE_ATTACHMENTS is not none
+    fail_msg: "Missing or invalid required variable(s) for restore process"
 
   tasks:
 
@@ -69,6 +93,12 @@
       import_role:
         name: deploy_app
       tags: [deploy]
+
+    - name: Sync attachments
+      import_role:
+        name: sync_attachments
+      when: INCLUDE_ATTACHMENTS | default(false) | bool
+      tags: [sync_attachments]
 
     - name: Restore database (Jira only)
       import_role:

@@ -1,0 +1,37 @@
+---
+application_links_map:
+  nps:
+    - shared-confluence
+  itsm-portal:
+    - wiki
+    - mbti-confluence
+    - shared-confluence
+  itas-jira:
+    - shared-confluence
+    - mbti-jira
+    - shared-jira
+  mbti-jira:
+    - shared-jira
+    - mbti-confluence
+    - itas-jira
+  mbb-jira:
+    - mbb-confluence
+  idea-jira:
+    - shared-confluence
+  shared-jira:
+    - shared-confluence
+    - mbti-jira
+    - mbti-confluence
+    - itas-jira
+    - wiki
+  pbk-jira:
+    - shared-confluence
+  dedicated-itgm-jira:
+    - dedicated-itgm-confluence
+  pilot-aftersales:
+    - pilot-aftersales-confluence
+  jira-tracker:
+    - confluence-docs
+  dtag-shared-jira:
+    - 
+  coe: []

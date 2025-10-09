@@ -15,6 +15,7 @@
     - name: Disable Jira plugins
       import_role:
         name: disable_plugins_jira
+      when: app == "jira"
       tags: [disable_plugins]
 
     - name: Set banner
@@ -22,8 +23,15 @@
         name: set_banner
       tags: [set_banner]
 
+    - name: Set Application Links
+      import_role:
+        name: set_application_links
+      when: app == "jira"
+      tags: [set_application_links]
+
     - name: Sync attachments
       import_role:
         name: sync_attachments
       when: INCLUDE_ATTACHMENTS | default(false) | bool
       tags: [sync_attachments]
+
