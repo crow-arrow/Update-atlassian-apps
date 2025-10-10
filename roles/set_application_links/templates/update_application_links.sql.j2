@@ -1,103 +1,16 @@
--- === Update Application Links for {{ jira_instance }} ({{ env }}) ===
--- Replace URLs inside propertystring.propertyvalue where property_key LIKE '%app%'
--- to match the correct environment ({{ env_prefix }}).
+-- === Update Application Links for {{ jira_instance | default(instance) }} ===
+-- This script replaces URLs inside propertystring.propertyvalue
+-- for linked applications defined in `app_links`.
 
--- Shared Confluence
+{% for link in app_links %}
+-- {{ link }}
 UPDATE propertystring
-SET propertyvalue = '{{ base_url_prefix }}/{{ env_prefix }}shared-confluence'
+SET propertyvalue = '{{ jira_baseurl | regex_replace("/[^/]+$", "") }}/{{ env_prefix }}{{ link }}'
 WHERE id = ANY (
-  SELECT ps.id FROM propertystring ps
+  SELECT ps.id
+  FROM propertystring ps
   INNER JOIN propertyentry pe ON ps.id = pe.id
-  WHERE ps.propertyvalue LIKE '%shared-confluence.{{ domain_root }}%'
+  WHERE ps.propertyvalue LIKE '%{{ link }}.{{ domain_root }}%'
     AND pe.property_key LIKE '%app%'
 );
-
--- Shared JIRA
-UPDATE propertystring
-SET propertyvalue = '{{ base_url_prefix }}/{{ env_prefix }}shared-jira'
-WHERE id = ANY (
-  SELECT ps.id FROM propertystring ps
-  INNER JOIN propertyentry pe ON ps.id = pe.id
-  WHERE ps.propertyvalue LIKE '%shared-jira.{{ domain_root }}%'
-    AND pe.property_key LIKE '%app%'
-);
-
--- MBTI JIRA
-UPDATE propertystring
-SET propertyvalue = '{{ base_url_prefix }}/{{ env_prefix }}mbti-jira'
-WHERE id = ANY (
-  SELECT ps.id FROM propertystring ps
-  INNER JOIN propertyentry pe ON ps.id = pe.id
-  WHERE ps.propertyvalue LIKE '%mbti-jira.{{ domain_root }}%'
-    AND pe.property_key LIKE '%app%'
-);
-
--- MBTI Confluence
-UPDATE propertystring
-SET propertyvalue = '{{ base_url_prefix }}/{{ env_prefix }}mbti-confluence'
-WHERE id = ANY (
-  SELECT ps.id FROM propertystring ps
-  INNER JOIN propertyentry pe ON ps.id = pe.id
-  WHERE ps.propertyvalue LIKE '%mbti-confluence.{{ domain_root }}%'
-    AND pe.property_key LIKE '%app%'
-);
-
--- ITAS JIRA
-UPDATE propertystring
-SET propertyvalue = '{{ base_url_prefix }}/{{ env_prefix }}itas-jira'
-WHERE id = ANY (
-  SELECT ps.id FROM propertystring ps
-  INNER JOIN propertyentry pe ON ps.id = pe.id
-  WHERE ps.propertyvalue LIKE '%itas-jira.{{ domain_root }}%'
-    AND pe.property_key LIKE '%app%'
-);
-
--- Wiki
-UPDATE propertystring
-SET propertyvalue = '{{ base_url_prefix }}/{{ env_prefix }}wiki'
-WHERE id = ANY (
-  SELECT ps.id FROM propertystring ps
-  INNER JOIN propertyentry pe ON ps.id = pe.id
-  WHERE ps.propertyvalue LIKE '%wiki.{{ domain_root }}%'
-    AND pe.property_key LIKE '%app%'
-);
-
--- MBB Confluence
-UPDATE propertystring
-SET propertyvalue = '{{ base_url_prefix }}/{{ env_prefix }}mbb-confluence'
-WHERE id = ANY (
-  SELECT ps.id FROM propertystring ps
-  INNER JOIN propertyentry pe ON ps.id = pe.id
-  WHERE ps.propertyvalue LIKE '%mbb-confluence.{{ domain_root }}%'
-    AND pe.property_key LIKE '%app%'
-);
-
--- Dedicated ITGM Confluence
-UPDATE propertystring
-SET propertyvalue = '{{ base_url_prefix }}/{{ env_prefix }}dedicated-itgm-confluence'
-WHERE id = ANY (
-  SELECT ps.id FROM propertystring ps
-  INNER JOIN propertyentry pe ON ps.id = pe.id
-  WHERE ps.propertyvalue LIKE '%dedicated-itgm-confluence.{{ domain_root }}%'
-    AND pe.property_key LIKE '%app%'
-);
-
--- Pilot Aftersales Confluence
-UPDATE propertystring
-SET propertyvalue = '{{ base_url_prefix }}/{{ env_prefix }}pilot-aftersales-confluence'
-WHERE id = ANY (
-  SELECT ps.id FROM propertystring ps
-  INNER JOIN propertyentry pe ON ps.id = pe.id
-  WHERE ps.propertyvalue LIKE '%pilot-aftersales-confluence.{{ domain_root }}%'
-    AND pe.property_key LIKE '%app%'
-);
-
--- Confluence Docs
-UPDATE propertystring
-SET propertyvalue = '{{ base_url_prefix }}/{{ env_prefix }}confluence-docs'
-WHERE id = ANY (
-  SELECT ps.id FROM propertystring ps
-  INNER JOIN propertyentry pe ON ps.id = pe.id
-  WHERE ps.propertyvalue LIKE '%confluence-docs.{{ domain_root }}%'
-    AND pe.property_key LIKE '%app%'
-);
+{% endfor %}

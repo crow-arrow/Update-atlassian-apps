@@ -33,5 +33,5 @@ application_links_map:
   jira-tracker:
     - confluence-docs
   dtag-shared-jira:
-    - 
+    - shared-confluence
   coe: []

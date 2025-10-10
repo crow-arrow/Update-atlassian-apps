@@ -1,7 +1,7 @@
 ---
-- name: Set service name depending on environment
-  set_fact:
-    SERVICE_NAME: "{{ lookup('vars', env | upper + '_SERVICE_NAME') }}"
+#- name: Set service name depending on environment
+#  set_fact:
+#    SERVICE_NAME: "{{ lookup('vars', env | upper + '_SERVICE_NAME') }}"
 
 - name: Stop service
   shell: "sudo /bin/systemctl stop {{ SERVICE_NAME }}"

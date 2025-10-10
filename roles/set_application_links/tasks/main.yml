@@ -1,4 +1,23 @@
 ---
+# 1️⃣ Проверка обязательных переменных
+- name: Validate required variables
+  ansible.builtin.assert:
+    that:
+      - jira_instance is defined
+      - env is defined
+      - db_host is defined
+      - db_user is defined
+      - db_name is defined
+      - db_password is defined
+      - base_url_prefix is defined
+      - domain_root is defined
+      - env_prefix is defined
+    fail_msg: >
+      One or more required variables are missing.
+      Make sure jira_instance, db_host, db_user, db_name,
+      db_password, base_url_prefix, env_prefix and domain_root are defined.
+  tags: [set_application_links]
+
 - name: Derive jira_instance for Mercedes-Benz
   ansible.builtin.set_fact:
     jira_instance: "{{ instance }}"
@@ -11,22 +30,10 @@
   when: domain_root == "daimlertruck.polygran.de"
   tags: [set_application_links]
 
-# 1️⃣ Проверка обязательных переменных
-- name: Validate required variables
-  ansible.builtin.assert:
-    that:
-      - jira_instance is defined
-      - db_host is defined
-      - db_user is defined
-      - db_name is defined
-      - db_password is defined
-      - base_url_prefix is defined
-      - domain_root is defined
-      - env_prefix is defined
-    fail_msg: >
-      One or more required variables are missing.
-      Make sure jira_instance, db_host, db_user, db_name,
-      db_password, base_url_prefix, env_prefix and domain_root are defined.
+- name: Define env_prefix dynamically
+  ansible.builtin.set_fact:
+    env_prefix: "{{ env ~ '-' if env != 'int' else '' }}"
+  when: env_prefix is not defined
   tags: [set_application_links]
 
 # 2️⃣ Подключаем YAML-мэппинг
@@ -62,12 +69,15 @@
     psql -h {{ db_host }} -U {{ db_user }} -d {{ db_name }} -f /tmp/update_application_links.sql
   environment:
     PGPASSWORD: "{{ db_password }}"
+  become: true
+  become_user: "{{ ENV_USER }}"
   register: set_app_links_result
   changed_when: false
+  when: app_links | length > 0
   tags: [set_application_links]
 
 # 7️⃣ Показываем результат
-- name: Show query output
+- name: Show summary of updated links
   ansible.builtin.debug:
     msg: |
       ✅ Updated application links for {{ jira_instance }}:
