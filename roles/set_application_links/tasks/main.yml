@@ -17,7 +17,6 @@
   when: env_prefix is not defined
   tags: [set_application_links]
 
-# 1️⃣ Проверка обязательных переменных
 - name: Validate required variables
   ansible.builtin.assert:
     that:
@@ -35,26 +34,22 @@
       {{ app }}_db_password, env_prefix and domain_root are defined.
   tags: [set_application_links]
 
-# 2️⃣ Подключаем YAML-мэппинг
 - name: Load application links mapping
   ansible.builtin.include_vars:
     file: application_links_map.yml
   tags: [set_application_links]
 
-# 3️⃣ Определяем, какие ссылки обновлять
 - name: Set app_links for current Jira instance
   ansible.builtin.set_fact:
     app_links: "{{ application_links_map[jira_instance] | default([]) }}"
   tags: [set_application_links]
 
-# 4️⃣ Проверяем, что есть ссылки
 - name: Fail if no app_links found for {{ jira_instance }}
   ansible.builtin.fail:
     msg: "No application links defined for {{ jira_instance }} in application_links_map.yml"
   when: app_links | length == 0
   tags: [set_application_links]
 
-# 5️⃣ Рендерим SQL под конкретные ссылки
 - name: Render SQL file for updating application links
   ansible.builtin.template:
     src: update_application_links.sql.j2
@@ -62,7 +57,6 @@
     mode: "0644"
   tags: [set_application_links]
 
-# 6️⃣ Применяем SQL через psql
 - name: Apply SQL file to {{ db_name }} database
   ansible.builtin.shell: |
     psql -h {{ db_host }} -U {{ db_user }} -d {{ db_name }} -f /tmp/update_application_links.sql
@@ -71,11 +65,9 @@
   become: true
   become_user: "{{ ENV_USER }}"
   register: set_app_links_result
-  changed_when: false
   when: app_links | length > 0
   tags: [set_application_links]
 
-# 7️⃣ Показываем результат
 - name: Show summary of updated links
   ansible.builtin.debug:
     msg: |
@@ -83,10 +75,10 @@
       {{ app_links | join(', ') }}
   tags: [set_application_links]
 
-# 8️⃣ Удаляем временный SQL-файл
 - name: Remove temporary SQL file
   ansible.builtin.file:
     path: /tmp/update_application_links.sql
     state: absent
   when: set_app_links_result is defined
+  ignore_errors: true
   tags: [set_application_links]

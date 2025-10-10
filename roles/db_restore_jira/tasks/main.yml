@@ -54,7 +54,6 @@
   become_user: "{{ ENV_USER }}"
   when: not use_pg_restore
   register: restore_result
-  changed_when: false
   failed_when: restore_result.rc != 0
   tags: [restore]
 
@@ -92,7 +91,6 @@
   become_user: "{{ ENV_USER }}"
   when: use_pg_restore
   register: restore_result
-  changed_when: false
   failed_when: restore_result.rc != 0
   tags: [restore]
 

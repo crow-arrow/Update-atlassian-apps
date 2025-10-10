@@ -28,7 +28,6 @@
   become: true
   become_user: "{{ ENV_USER }}"
   register: pg_dump_result
-  changed_when: false
   failed_when: pg_dump_result.rc != 0
 
 - name: Find first-level attachment subdirs (excluding 'insight')
