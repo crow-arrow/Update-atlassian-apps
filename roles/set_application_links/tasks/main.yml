@@ -27,13 +27,12 @@
       - db_user is defined
       - db_name is defined
       - (app == "jira" and jira_db_password is defined) or (app == "confluence" and confluence_db_password is defined)
-      - base_url_prefix is defined
       - domain_root is defined
       - env_prefix is defined
     fail_msg: >
       One or more required variables are missing.
       Make sure jira_instance, db_host, db_user, db_name,
-      db_password, base_url_prefix, env_prefix and domain_root are defined.
+      {{ app }}_db_password, env_prefix and domain_root are defined.
   tags: [set_application_links]
 
 # 2️⃣ Подключаем YAML-мэппинг
