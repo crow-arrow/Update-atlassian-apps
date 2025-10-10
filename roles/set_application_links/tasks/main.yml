@@ -1,4 +1,22 @@
 ---
+- name: Set jira_instance for Mercedes-Benz
+  ansible.builtin.set_fact:
+    jira_instance: "{{ instance }}"
+  when: domain_root == "mercedes-benz.polygran.de"
+  tags: [set_application_links]
+
+- name: Set jira_instance for Daimler Truck
+  ansible.builtin.set_fact:
+    jira_instance: "dtag-{{ instance }}"
+  when: domain_root == "daimlertruck.polygran.de"
+  tags: [set_application_links]
+
+- name: Set env_prefix dynamically
+  ansible.builtin.set_fact:
+    env_prefix: "{{ env ~ '-' if env != 'int' else '' }}"
+  when: env_prefix is not defined
+  tags: [set_application_links]
+
 # 1️⃣ Проверка обязательных переменных
 - name: Validate required variables
   ansible.builtin.assert:
@@ -16,24 +34,6 @@
       One or more required variables are missing.
       Make sure jira_instance, db_host, db_user, db_name,
       db_password, base_url_prefix, env_prefix and domain_root are defined.
-  tags: [set_application_links]
-
-- name: Derive jira_instance for Mercedes-Benz
-  ansible.builtin.set_fact:
-    jira_instance: "{{ instance }}"
-  when: domain_root == "mercedes-benz.polygran.de"
-  tags: [set_application_links]
-
-- name: Derive jira_instance for Daimler Truck
-  ansible.builtin.set_fact:
-    jira_instance: "dtag-{{ instance }}"
-  when: domain_root == "daimlertruck.polygran.de"
-  tags: [set_application_links]
-
-- name: Define env_prefix dynamically
-  ansible.builtin.set_fact:
-    env_prefix: "{{ env ~ '-' if env != 'int' else '' }}"
-  when: env_prefix is not defined
   tags: [set_application_links]
 
 # 2️⃣ Подключаем YAML-мэппинг
