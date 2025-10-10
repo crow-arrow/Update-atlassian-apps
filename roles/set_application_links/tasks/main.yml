@@ -26,7 +26,7 @@
       - db_host is defined
       - db_user is defined
       - db_name is defined
-      - db_password is defined
+      - (app == "jira" and jira_db_password is defined) or (app == "confluence" and confluence_db_password is defined)
       - base_url_prefix is defined
       - domain_root is defined
       - env_prefix is defined
@@ -68,7 +68,7 @@
   ansible.builtin.shell: |
     psql -h {{ db_host }} -U {{ db_user }} -d {{ db_name }} -f /tmp/update_application_links.sql
   environment:
-    PGPASSWORD: "{{ db_password }}"
+    PGPASSWORD: "{{ (app == 'jira') | ternary(jira_db_password, confluence_db_password) }}"
   become: true
   become_user: "{{ ENV_USER }}"
   register: set_app_links_result
