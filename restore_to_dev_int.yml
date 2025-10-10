@@ -128,6 +128,12 @@
       import_role:
         name: set_base_url
       tags: [set_base_url]
+    
+    - name: Set Application Links
+      import_role:
+        name: set_application_links
+      when: app == "jira"
+      tags: [set_application_links]
 
     - name: Set banner
       import_role:
