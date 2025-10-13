@@ -52,7 +52,7 @@
 
   pre_tasks:
   - name: Validate restore input vars
-    assert:
+    ansible.builtin.assert:
       that:
         - app is defined
         - app in ['jira', 'confluence']
@@ -60,7 +60,7 @@
         - env is defined
         - ENV_USER is defined
         - INCLUDE_ATTACHMENTS is not none
-    fail_msg: "Missing or invalid required variable(s) for restore process"
+      fail_msg: "Missing or invalid required variable(s) for restore process"
 
   tasks:
 
