@@ -73,6 +73,7 @@
         name: service_control
       vars:
         service_action: stop
+      tags: [service_control]
 
     - name: Backup current config before deployment
       import_role:
@@ -145,6 +146,7 @@
         name: service_control
       vars:
         service_action: start
+      tags: [service_control]
 
     #- name: Trigger Jira reindex
      # import_tasks: roles/configure_jira_instance/tasks/reindex.yml
