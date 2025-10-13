@@ -12,23 +12,24 @@
     - inventories/production/group_vars/production/vault.yml
 
   pre_tasks:
-  - name: Validate critical vars for snapshot_app role
-    ansible.builtin.assert:
-      that:
-        - app is defined
-        - app in ['jira', 'confluence']
-        - instance is defined
-        - snapshot_dir is defined
-        - ENV_USER is defined
-        - GROUP is defined
-        - application_data_home is defined
-        - db_host is defined
-        - db_user is defined
-        - db_name is defined
-        - (app == 'jira' and jira_db_password is defined) or (app == 'confluence' and confluence_db_password is defined)
-        - app_base is defined
-        - snapshot_expiry_age is defined
-      fail_msg: "Missing or invalid required variable(s) for snapshot_app role"
+    - name: Validate critical vars for snapshot_app role
+      ansible.builtin.assert:
+        that:
+          - app is defined
+          - app in ['jira', 'confluence']
+          - instance is defined
+          - snapshot_dir is defined
+          - ENV_USER is defined
+          - GROUP is defined
+          - application_data_home is defined
+          - db_host is defined
+          - db_user is defined
+          - db_name is defined
+          - (app == 'jira' and jira_db_password is defined) or (app == 'confluence' and confluence_db_password is defined)
+          - app_base is defined
+          - snapshot_expiry_age is defined
+        fail_msg: "Missing or invalid required variable(s) for snapshot_app role"
+        success_msg: "All required variables for snapshot_app are present."
 
   tasks:
 
