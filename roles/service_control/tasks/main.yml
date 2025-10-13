@@ -3,20 +3,40 @@
 #  set_fact:
 #    SERVICE_NAME: "{{ lookup('vars', env | upper + '_SERVICE_NAME') }}"
 
-- name: Stop service
-  shell: "sudo /bin/systemctl stop {{ SERVICE_NAME }}"
-  when:
-    - service_action == "stop"
-    - "'int' in group_names"
-  register: stop_result
-  ignore_errors: false
-  become: false
+# - name: Stop service
+#   shell: "sudo /bin/systemctl stop {{ SERVICE_NAME }}"
+#   when:
+#     - service_action == "stop"
+#     - "'int' in group_names"
+#   register: stop_result
+#   ignore_errors: false
+#   become: false
 
-- name: Start service
-  shell: "sudo /bin/systemctl start {{ SERVICE_NAME }}"
+# - name: Start service
+#   shell: "sudo /bin/systemctl start {{ SERVICE_NAME }}"
+#   when:
+#     - service_action == "start"
+#     - "'int' in group_names"
+#   register: start_result
+#   ignore_errors: false
+#   become: false
+
+- name: Start service with stop-jira.sh
+  ansible.builtin.shell: "{{ app_base }}/{{ env }}/jira/{{ instance }}/bin/stop-jira.sh"
   when:
     - service_action == "start"
-    - "'int' in group_names"
+    - app == "jira"
   register: start_result
   ignore_errors: false
-  become: false
+  become: true
+  become_user: "{{ ENV_USER }}"
+    
+- name: Stop service with stop-jira.sh
+  ansible.builtin.shell: "{{ app_base }}/{{ env }}/jira/{{ instance }}/bin/start-jira.sh"
+  when:
+    - service_action == "stop"
+    - app == "jira"
+  register: stop_result
+  ignore_errors: false
+  become: true
+  become_user: "{{ ENV_USER }}"
