@@ -21,17 +21,27 @@
 #   ignore_errors: false
 #   become: false
 
-- name: Start service with stop-jira.sh
-  ansible.builtin.shell: "{{ app_base }}/{{ env }}/jira/{{ instance }}/bin/stop-jira.sh"
+- name: Stop service with stop-jira.sh
+  ansible.builtin.shell: |
+    pid_file="{{ app_base }}/{{ env }}/jira/{{ instance }}/work/catalina.pid"
+    if [ -f "$pid_file" ]; then
+      echo "PID file found — stopping Jira..."
+      {{ app_base }}/{{ env }}/jira/{{ instance }}/bin/stop-jira.sh || true
+    else
+      echo "Jira is not running — skipping stop."
+    fi
+  args:
+    executable: /bin/bash
   when:
     - service_action == "stop"
     - app == "jira"
   register: stop_result
-  ignore_errors: false
+  failed_when: false
+  changed_when: "'stopping Jira' in stop_result.stdout"
   become: true
   become_user: "{{ ENV_USER }}"
     
-- name: Stop service with start-jira.sh
+- name: Start service with start-jira.sh
   ansible.builtin.shell: "{{ app_base }}/{{ env }}/jira/{{ instance }}/bin/start-jira.sh"
   when:
     - service_action == "start"
