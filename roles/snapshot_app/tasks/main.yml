@@ -1,6 +1,7 @@
 - name: Set homedir archive path
   set_fact:
     homedir_archive: "{{ snapshot_dir }}/{{ current_date }}_{{ instance }}_homedir.tgz"
+  tags: [snapshot]
 
 - name: Ensure snapshot and upload directories exist
   ansible.builtin.file:
@@ -11,6 +12,7 @@
     group: "{{ GROUP }}"
   become: true
   become_user: "{{ ENV_USER }}"
+  tags: [snapshot]
 
 - name: Dump PostgreSQL DB using pg_dump (custom format)
   ansible.builtin.shell: >
@@ -29,6 +31,7 @@
   become_user: "{{ ENV_USER }}"
   register: pg_dump_result
   failed_when: pg_dump_result.rc != 0
+  tags: [snapshot]
 
 - name: Find first-level attachment subdirs (excluding 'insight')
   find:
@@ -39,12 +42,14 @@
     excludes: insight
   register: attachment_dirs
   ignore_errors: true
+  tags: [snapshot]
 
 - name: Render exclude-from file
   template:
     src: excl_attachments.txt.j2
     dest: "{{ snapshot_dir }}/excl_attachments.txt"
   when: attachment_dirs.files | length > 1
+  tags: [snapshot]
 
 - name: Create homedir archive
   shell: |
@@ -66,17 +71,20 @@
   when: attachment_dirs.files | length > 1
   become: true
   become_user: "{{ ENV_USER }}"
+  tags: [snapshot]
 
 - name: Remove temporary exclude-from file
   file:
     path: "{{ snapshot_dir }}/excl_attachments.txt"
     state: absent
   when: attachment_dirs.files | length > 1
+  tags: [snapshot]
 
 - name: Check if attachments directory exists
   ansible.builtin.stat:
     path: "{{ application_data_home }}/data/attachments"
   register: attachments_dir_status
+  tags: [snapshot]
 
 - name: Set permissions on attachment directories (fast)
   ansible.builtin.shell: |
@@ -84,6 +92,7 @@
   when: attachments_dir_status.stat.exists
   become: true
   become_user: "{{ ENV_USER }}"
+  tags: [snapshot]
 
 - name: Set permissions on attachment files (safe)
   ansible.builtin.shell: |
@@ -91,6 +100,7 @@
   when: attachments_dir_status.stat.exists
   become: true
   become_user: "{{ ENV_USER }}"
+  tags: [snapshot]
 
 - name: Create appdata archive
   shell: |
@@ -103,6 +113,7 @@
     chdir: "{{ app_base }}/{{ app }}"
   become: true
   become_user: "{{ ENV_USER }}"
+  tags: [snapshot]
 
 - name: Find old snapshots
   find:
@@ -111,6 +122,7 @@
     age: "{{ snapshot_expiry_age }}"
     recurse: no
   register: old_snapshots
+  tags: [snapshot]
 
 - name: Remove old snapshots
   file:
@@ -118,3 +130,4 @@
     state: absent
   loop: "{{ old_snapshots.files }}"
   when: old_snapshots.matched > 0
+  tags: [snapshot]
