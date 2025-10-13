@@ -5,7 +5,7 @@
   gather_facts: true
 
   vars:
-    now: "{{ lookup('pipe', 'date +%Y%m%d') }}"
+    current_date: "{{ lookup('pipe', 'date +%Y%m%d') }}"
 
   vars_files:
     - "inventories/{{ env }}/group_vars/{{ instance }}/vault.yml"

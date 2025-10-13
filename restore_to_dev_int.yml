@@ -6,7 +6,7 @@
   gather_facts: true
 
   vars:
-    now: "{{ lookup('pipe', 'date +%Y%m%d') }}"
+    current_date: "{{ lookup('pipe', 'date +%Y%m%d') }}"
 
   vars_files:
     - inventories/production/group_vars/{{ instance }}/vault.yml
@@ -45,7 +45,7 @@
   gather_facts: true
 
   vars:
-    now: "{{ lookup('pipe', 'date +%Y%m%d') }}"
+    current_date: "{{ lookup('pipe', 'date +%Y%m%d') }}"
 
   vars_files:
     - "inventories/{{ env }}/group_vars/{{ instance }}/vault.yml"
@@ -66,7 +66,7 @@
 
     - name: Set timestamp fact
       ansible.builtin.set_fact:
-        now: "{{ ansible_date_time.date | regex_replace('-', '') }}"
+        current_date: "{{ ansible_date_time.date | regex_replace('-', '') }}"
 
     - name: Stop application service
       import_role:

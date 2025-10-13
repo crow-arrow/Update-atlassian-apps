@@ -1,7 +1,7 @@
 ---
 - name: Detect dump file format
   ansible.builtin.shell: >
-    file "{{ upload_dir }}/{{ now }}_{{ instance }}.dump"
+    file "{{ upload_dir }}/{{ current_date }}_{{ instance }}.dump"
   register: dump_format
   changed_when: false
   tags: [restore]
@@ -41,7 +41,7 @@
     --port="{{ db_port | default(5432) }}"
     --username="{{ db_user }}"
     --dbname="{{ db_name }}"
-    --file="{{ upload_dir }}/{{ now }}_{{ instance }}.dump"
+    --file="{{ upload_dir }}/{{ current_date }}_{{ instance }}.dump"
     --echo-errors
     --echo-all
     --set ON_ERROR_STOP=on
@@ -76,7 +76,7 @@
     --dbname="{{ db_name }}"
     --clean 
     --if-exists
-    "{{ upload_dir }}/{{ now }}_{{ instance }}.dump"
+    "{{ upload_dir }}/{{ current_date }}_{{ instance }}.dump"
     --verbose
     --exit-on-error
     --no-owner
@@ -105,7 +105,7 @@
 
 - name: Remove uploaded dump file
   file:
-    path: "{{ upload_dir }}/{{ now }}_{{ instance }}.dump"
+    path: "{{ upload_dir }}/{{ current_date }}_{{ instance }}.dump"
     state: absent
   ignore_errors: true
   tags: [restore]

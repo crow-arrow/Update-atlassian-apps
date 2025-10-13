@@ -1,6 +1,6 @@
 - name: Set homedir archive path
   set_fact:
-    homedir_archive: "{{ snapshot_dir }}/{{ now }}_{{ instance }}_homedir.tgz"
+    homedir_archive: "{{ snapshot_dir }}/{{ current_date }}_{{ instance }}_homedir.tgz"
 
 - name: Ensure snapshot and upload directories exist
   ansible.builtin.file:
@@ -21,7 +21,7 @@
     --format=custom
     --no-owner
     --no-acl
-    --file="{{ snapshot_dir }}/{{ now }}_{{ instance }}.dump"
+    --file="{{ snapshot_dir }}/{{ current_date }}_{{ instance }}.dump"
     "{{ db_name }}"
   environment:
     PGPASSWORD: "{{ (app == 'jira') | ternary(jira_db_password, confluence_db_password) }}"
@@ -98,7 +98,7 @@
       --exclude='./temp/*' \
       --exclude='./logs/*' \
       --exclude='./work/*' \
-      -zcvf '{{ snapshot_dir }}/{{ now }}_{{ instance }}_appdata.tgz' .
+      -zcvf '{{ snapshot_dir }}/{{ current_date }}_{{ instance }}_appdata.tgz' .
   args:
     chdir: "{{ app_base }}/{{ app }}"
   become: true

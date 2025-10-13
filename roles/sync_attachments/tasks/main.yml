@@ -47,7 +47,7 @@
   vars:
     ansible_ssh_common_args: >-
       -o StrictHostKeyChecking=no
-      -o UserKnownHostsFile=/dev/null
+      -o UserKcurrent_datenHostsFile=/dev/null
       -i {{ ssh_key_path }}
   delegate_to: "{{ inventory_hostname }}"
   become: false

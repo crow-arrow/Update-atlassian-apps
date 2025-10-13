@@ -1,6 +1,6 @@
 env: int
 
-now: "{{ lookup('pipe','date +%Y%m%d') }}"
+current_date: "{{ lookup('pipe','date +%Y%m%d') }}"
 
 USER: amalyuld
 

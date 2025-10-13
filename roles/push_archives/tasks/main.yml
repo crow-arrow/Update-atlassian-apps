@@ -25,7 +25,7 @@
   set_fact:
     ansible_ssh_common_args: >-
       -o StrictHostKeyChecking=no
-      -o UserKnownHostsFile=/dev/null
+      -o UserKcurrent_datenHostsFile=/dev/null
       -i {{ ssh_key_path }}
   become: false
   tags: [push]
@@ -50,8 +50,8 @@
     rsync_path: "rsync"
     use_ssh_args: true
     rsync_opts:
-      - "--include={{ now }}_{{ instance }}.dump"
-      - "--include={{ now }}_{{ instance }}_*.tgz"
+      - "--include={{ current_date }}_{{ instance }}.dump"
+      - "--include={{ current_date }}_{{ instance }}_*.tgz"
       - "--exclude=*"
       - "--no-times"
       - "--no-perms"
