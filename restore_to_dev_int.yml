@@ -9,7 +9,7 @@
     now: "{{ lookup('pipe', 'date +%Y%m%d') }}"
 
   vars_files:
-    - inventories/production/group_vars/production/vault.yml
+    - inventories/production/group_vars/{{ instance }}/vault.yml
 
   pre_tasks:
     - name: Validate critical vars for snapshot_app role
