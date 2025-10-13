@@ -14,7 +14,7 @@
 
   pre_tasks:
   - name: Validate critical vars for snapshot_app role
-    assert:
+    ansible.builtin.assert:
       that:
         - app is defined
         - app in ['jira', 'confluence']
@@ -29,7 +29,7 @@
         - (app == 'jira' and jira_db_password is defined) or (app == 'confluence' and confluence_db_password is defined)
         - app_base is defined
         - snapshot_expiry_age is defined
-    fail_msg: "Missing or invalid required variable(s) for snapshot_app role"
+      fail_msg: "Missing or invalid required variable(s) for snapshot_app role"
 
   tasks:
 
