@@ -25,7 +25,7 @@
   set_fact:
     ansible_ssh_common_args: >-
       -o StrictHostKeyChecking=no
-      -o UserKcurrent_datenHostsFile=/dev/null
+      -o UserKnownHostsFile=/dev/null
       -i {{ ssh_key_path }}
   become: false
   tags: [push]
