@@ -24,19 +24,19 @@
 - name: Start service with stop-jira.sh
   ansible.builtin.shell: "{{ app_base }}/{{ env }}/jira/{{ instance }}/bin/stop-jira.sh"
   when:
-    - service_action == "start"
+    - service_action == "stop"
     - app == "jira"
-  register: start_result
+  register: stop_result
   ignore_errors: false
   become: true
   become_user: "{{ ENV_USER }}"
     
-- name: Stop service with stop-jira.sh
+- name: Stop service with start-jira.sh
   ansible.builtin.shell: "{{ app_base }}/{{ env }}/jira/{{ instance }}/bin/start-jira.sh"
   when:
-    - service_action == "stop"
+    - service_action == "start"
     - app == "jira"
-  register: stop_result
+  register: start_result
   ignore_errors: false
   become: true
   become_user: "{{ ENV_USER }}"
