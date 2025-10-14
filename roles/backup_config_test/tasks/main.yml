@@ -2,55 +2,55 @@
   stat:
     path: "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}"
   register: instance_dir
-  tags: [backup]
+  tags: [backup_test]
 
 - name: Check if dbconfig.xml exists
   stat:
     path: "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}/dbconfig.xml"
   register: dbconfig_stat
-  tags: [backup]
+  tags: [backup_test]
 
 - name: Check if eazybi.toml exists
   stat:
     path: "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}/eazybi.toml"
   register: eazybi_stat
-  tags: [backup]
+  tags: [backup_test]
 
 - name: Check if server.xml exists
   stat:
     path: "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}/conf/server.xml"
   register: server_stat
-  tags: [backup]
+  tags: [backup_test]
 
 - name: Check if setenv.sh exists
   stat:
     path: "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}/bin/setenv.sh"
   register: setenv_stat
-  tags: [backup]
+  tags: [backup_test]
 
 - name: Check if jira-application.properties exists
   stat:
     path: "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}/atlassian-jira/WEB-INF/classes/jira-application.properties"
   register: jira_app_properties_stat
-  tags: [backup]
+  tags: [backup_test]
 
 - name: Check if secrets-config.yaml exists
   stat:
     path: "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}/secrets-config.yaml"
   register: secrets_config_stat
-  tags: [backup]
+  tags: [backup_test]
 
 - name: Check if secured dir exists
   stat:
     path: "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}/secured"
   register: secured_dir_stat
-  tags: [backup]
+  tags: [backup_test]
 
 - name: Check if keys dir exists
   stat:
     path: "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}/keys"
   register: keys_dir_stat
-  tags: [backup]
+  tags: [backup_test]
 
 - name: Ensure backup directories exist
   file:
@@ -60,7 +60,7 @@
   loop:
     - "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}_backup"
     - "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}_backup"
-  tags: [backup]
+  tags: [backup_test]
 
 - name: Backup dbconfig.xml
   copy:
@@ -70,7 +70,7 @@
     mode: preserve
   become: true
   when: dbconfig_stat.stat.exists
-  tags: [backup]
+  tags: [backup_test]
 
 - name: Backup eazybi.toml
   copy:
@@ -80,7 +80,7 @@
     mode: preserve
   become: true
   when: eazybi_stat.stat.exists
-  tags: [backup]
+  tags: [backup_test]
 
 - name: Backup server.xml
   copy:
@@ -90,7 +90,7 @@
     mode: preserve
   become: true
   when: server_stat.stat.exists
-  tags: [backup]
+  tags: [backup_test]
 
 - name: Backup setenv.sh
   copy:
@@ -100,7 +100,7 @@
     mode: preserve
   become: true
   when: setenv_stat.stat.exists
-  tags: [backup]
+  tags: [backup_test]
 
 - name: Backup jira-application.properties
   copy:
@@ -110,7 +110,7 @@
     mode: preserve
   become: true
   when: jira_app_properties_stat.stat.exists
-  tags: [backup]
+  tags: [backup_test]
 
 - name: Backup secrets-config.yaml
   copy:
@@ -120,7 +120,7 @@
     mode: preserve
   become: true
   when: secrets_config_stat.stat.exists
-  tags: [backup]
+  tags: [backup_test]
 
 - name: Backup secured directory
   copy:
@@ -130,7 +130,7 @@
     mode: preserve
   become: true
   when: secured_dir_stat.stat.exists
-  tags: [backup]
+  tags: [backup_test]
 
 - name: Backup keys directory
   copy:
@@ -140,4 +140,4 @@
     mode: preserve
   become: true
   when: keys_dir_stat.stat.exists
-  tags: [backup]
+  tags: [backup_test]
