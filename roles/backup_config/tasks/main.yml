@@ -46,6 +46,12 @@
   register: secured_dir_stat
   tags: [backup]
 
+- name: Check if keys dir exists
+  stat:
+    path: "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}/keys"
+  register: keys_dir_stat
+  tags: [backup]
+
 - name: Backup dbconfig.xml
   command: >
     cp -a "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}/dbconfig.xml"
@@ -100,4 +106,12 @@
           "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}_secured"
   become: true
   when: secured_dir_stat.stat.exists
+  tags: [backup]
+
+- name: Backup keys directory
+  command: >
+    cp -a "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}/keys"
+          "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}_keys"
+  become: true
+  when: keys_dir_stat.stat.exists
   tags: [backup]

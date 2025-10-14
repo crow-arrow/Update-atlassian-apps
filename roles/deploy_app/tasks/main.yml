@@ -27,6 +27,7 @@
     - "{{ app_path }}/bin"
     - "{{ app_path }}/atlassian-jira/WEB-INF/classes"
     - "{{ app_data_path }}"
+    - "{{ app_data_path }}"
   become: true
 
 - name: Unpack appdata.tgz
@@ -60,8 +61,16 @@
 
 - name: Restore secured directory
   copy:
-    src: "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}_secured"
-    dest: "{{ app_data_path }}/secured"
+    src: "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}_secured/"
+    dest: "{{ app_data_path }}/secured/"
+    remote_src: yes
+    mode: preserve
+  ignore_errors: true
+
+- name: Restore keys directory
+  copy:
+    src: "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}_keys/"
+    dest: "{{ app_data_path }}/keys/"
     remote_src: yes
     mode: preserve
   ignore_errors: true

@@ -8,18 +8,24 @@
 #   when:
 #     - service_action == "stop"
 #     - "'int' in group_names"
+#     - app == "jira"
 #   register: stop_result
 #   ignore_errors: false
-#   become: false
+    # become: true
+    # become_user: "{{ ENV_USER }}"
+    # tags: [service_control]
 
 # - name: Start service
 #   shell: "sudo /bin/systemctl start {{ SERVICE_NAME }}"
 #   when:
 #     - service_action == "start"
 #     - "'int' in group_names"
+#     - app == "jira"
 #   register: start_result
 #   ignore_errors: false
-#   become: false
+    # become: true  
+    # become_user: "{{ ENV_USER }}"
+    # tags: [service_control]
 
 - name: Stop service with stop-jira.sh
   ansible.builtin.shell: |
