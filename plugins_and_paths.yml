@@ -39,3 +39,8 @@
       import_role:
         name: backup_config_test
       tags: [backup_jira]
+
+    - name: Deploy new version from archives
+      import_role:
+        name: deploy_app_copy
+      tags: [deploy]
