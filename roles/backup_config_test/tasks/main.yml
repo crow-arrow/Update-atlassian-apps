@@ -1,17 +1,24 @@
 ---
+- name: Set paths
+  set_fact:
+    app_path: "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}"
+    app_data_path: "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}"
+    app_backup_path: "{{ app_path }}_backup"
+    app_data_backup_path: "{{ app_data_path }}_backup"
+
 - name: Check if important config files and directories exist
   stat:
     path: "{{ item.path }}"
   register: file_check
   loop:
-    - { name: "dbconfig", path: "{{ jira_data_base }}/dbconfig.xml" }
-    - { name: "eazybi", path: "{{ jira_data_base }}/eazybi.toml" }
-    - { name: "server", path: "{{ jira_base }}/conf/server.xml" }
-    - { name: "setenv", path: "{{ jira_base }}/bin/setenv.sh" }
-    - { name: "jira_properties", path: "{{ jira_base }}/atlassian-jira/WEB-INF/classes/jira-application.properties" }
-    - { name: "secrets", path: "{{ jira_data_base }}/secrets-config.yaml" }
-    - { name: "secured_dir", path: "{{ jira_data_base }}/secured" }
-    - { name: "keys_dir", path: "{{ jira_data_base }}/keys" }
+    - { name: "dbconfig", path: "{{ app_data_path }}/dbconfig.xml" }
+    - { name: "eazybi", path: "{{ app_data_path }}/eazybi.toml" }
+    - { name: "server", path: "{{ app_path }}/conf/server.xml" }
+    - { name: "setenv", path: "{{ app_path }}/bin/setenv.sh" }
+    - { name: "jira_properties", path: "{{ app_path }}/atlassian-jira/WEB-INF/classes/jira-application.properties" }
+    - { name: "secrets", path: "{{ app_data_path }}/secrets-config.yaml" }
+    - { name: "secured_dir", path: "{{ app_data_path }}/secured" }
+    - { name: "keys_dir", path: "{{ app_data_path }}/keys" }
   tags: [backup_jira]
 
 - name: Ensure backup directories exist
@@ -20,8 +27,8 @@
     state: directory
     mode: '0755'
   loop:
-    - "{{ jira_data_backup_root }}"
-    - "{{ jira_backup_root }}"
+    - "{{ app_data_backup_path }}"
+    - "{{ app_backup_path }}"
   tags: [backup_jira]
 
 - name: Backup Jira configuration and directories to {{ instance }}_backup
@@ -31,14 +38,14 @@
     remote_src: yes
     mode: preserve
   loop:
-    - { src: "{{ jira_data_base }}/dbconfig.xml", dest: "{{ jira_data_backup_root }}/dbconfig.xml" }
-    - { src: "{{ jira_data_base }}/eazybi.toml", dest: "{{ jira_data_backup_root }}/eazybi.toml" }
-    - { src: "{{ jira_base }}/conf/server.xml", dest: "{{ jira_backup_root }}/server.xml" }
-    - { src: "{{ jira_base }}/bin/setenv.sh", dest: "{{ jira_backup_root }}/setenv.sh" }
-    - { src: "{{ jira_base }}/atlassian-jira/WEB-INF/classes/jira-application.properties", dest: "{{ jira_backup_root }}/jira-application.properties.bak" }
-    - { src: "{{ jira_data_base }}/secrets-config.yaml", dest: "{{ jira_data_backup_root }}/secrets-config.yaml" }
-    - { src: "{{ jira_data_base }}/secured/", dest: "{{ jira_data_backup_root }}/secured/" }
-    - { src: "{{ jira_data_base }}/keys/", dest: "{{ jira_data_backup_root }}/keys/" }
+    - { src: "{{ app_data_path }}/dbconfig.xml", dest: "{{ app_data_backup_path }}/dbconfig.xml" }
+    - { src: "{{ app_data_path }}/eazybi.toml", dest: "{{ app_data_backup_path }}/eazybi.toml" }
+    - { src: "{{ app_path }}/conf/server.xml", dest: "{{ app_backup_path }}/server.xml" }
+    - { src: "{{ app_path }}/bin/setenv.sh", dest: "{{ app_backup_path }}/setenv.sh" }
+    - { src: "{{ app_path }}/atlassian-jira/WEB-INF/classes/jira-application.properties", dest: "{{ app_backup_path }}/jira-application.properties.bak" }
+    - { src: "{{ app_data_path }}/secrets-config.yaml", dest: "{{ app_data_backup_path }}/secrets-config.yaml" }
+    - { src: "{{ app_data_path }}/secured/", dest: "{{ app_data_backup_path }}/secured/" }
+    - { src: "{{ app_data_path }}/keys/", dest: "{{ app_data_backup_path }}/keys/" }
   become: true
   tags: [backup_jira]
 
