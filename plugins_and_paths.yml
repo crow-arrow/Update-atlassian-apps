@@ -35,3 +35,7 @@
       when: INCLUDE_ATTACHMENTS | default(false) | bool
       tags: [sync_attachments]
 
+    - name: Backup current config before deployment
+      import_role:
+        name: backup_config_test
+      tags: [backup_test]

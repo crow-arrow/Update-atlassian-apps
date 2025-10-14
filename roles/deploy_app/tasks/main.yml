@@ -92,4 +92,5 @@
   loop:
     - "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}_secrets-config.yaml"
     - "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}_secured"
+    - "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}_keys"
   ignore_errors: true
