@@ -3,8 +3,8 @@
   set_fact:
     app_path: "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}"
     app_data_path: "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}"
-    app_backup_path: "{{ app_path }}_backup"
-    app_data_backup_path: "{{ app_data_path }}_backup"
+    app_backup_path: "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}_backup"
+    app_data_backup_path: "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}_backup"
 
 - name: Check if important config files and directories exist
   stat:
