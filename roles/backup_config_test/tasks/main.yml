@@ -54,8 +54,8 @@
 
 - name: Filter existing config files and directories
   set_fact:
-    filtered_backup_test_file_suffixes: "{{ backup_test_file_suffixes | selectattr('src', 'in', existing_file_paths) | list }}"
-    filtered_backup_test_dir_suffixes: "{{ backup_test_dir_suffixes | selectattr('src', 'in', existing_dir_paths) | list }}"
+    filtered_backup_file_suffixes: "{{ backup_file_suffixes | selectattr('src', 'in', existing_file_paths) | list }}"
+    filtered_backup_dir_suffixes: "{{ backup_dir_suffixes | selectattr('src', 'in', existing_dir_paths) | list }}"
   vars:
     existing_file_paths: >-
       {{
@@ -85,7 +85,7 @@
     dest: "{{ item.dest }}"
     remote_src: yes
     mode: preserve
-  loop: "{{ filtered_backup_test_file_suffixes }}"
+  loop: "{{ filtered_backup_file_suffixes }}"
   become: true
   tags: [backup_test]
 
@@ -95,6 +95,7 @@
     dest: "{{ item.dest }}"
     remote_src: yes
     mode: preserve
-  loop: "{{ filtered_backup_test_dir_suffixes }}"
+  loop: "{{ filtered_backup_dir_suffixes }}"
   become: true
   tags: [backup_test]
+
