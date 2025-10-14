@@ -77,8 +77,8 @@
 
     - name: Backup current config before deployment
       import_role:
-        name: backup_config
-      tags: [backup]
+        name: backup_config_jira
+      tags: [backup_jira]
 
     - name: Push archives to target host
       import_role:

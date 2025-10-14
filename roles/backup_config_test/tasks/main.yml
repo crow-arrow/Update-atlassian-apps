@@ -1,56 +1,18 @@
-- name: Check if instance directory exists
+---
+- name: Check if important config files and directories exist
   stat:
-    path: "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}"
-  register: instance_dir
-  tags: [backup_test]
-
-- name: Check if dbconfig.xml exists
-  stat:
-    path: "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}/dbconfig.xml"
-  register: dbconfig_stat
-  tags: [backup_test]
-
-- name: Check if eazybi.toml exists
-  stat:
-    path: "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}/eazybi.toml"
-  register: eazybi_stat
-  tags: [backup_test]
-
-- name: Check if server.xml exists
-  stat:
-    path: "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}/conf/server.xml"
-  register: server_stat
-  tags: [backup_test]
-
-- name: Check if setenv.sh exists
-  stat:
-    path: "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}/bin/setenv.sh"
-  register: setenv_stat
-  tags: [backup_test]
-
-- name: Check if jira-application.properties exists
-  stat:
-    path: "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}/atlassian-jira/WEB-INF/classes/jira-application.properties"
-  register: jira_app_properties_stat
-  tags: [backup_test]
-
-- name: Check if secrets-config.yaml exists
-  stat:
-    path: "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}/secrets-config.yaml"
-  register: secrets_config_stat
-  tags: [backup_test]
-
-- name: Check if secured dir exists
-  stat:
-    path: "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}/secured"
-  register: secured_dir_stat
-  tags: [backup_test]
-
-- name: Check if keys dir exists
-  stat:
-    path: "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}/keys"
-  register: keys_dir_stat
-  tags: [backup_test]
+    path: "{{ item.path }}"
+  register: file_check
+  loop:
+    - { name: "dbconfig", path: "{{ jira_data_base }}/dbconfig.xml" }
+    - { name: "eazybi", path: "{{ jira_data_base }}/eazybi.toml" }
+    - { name: "server", path: "{{ jira_base }}/conf/server.xml" }
+    - { name: "setenv", path: "{{ jira_base }}/bin/setenv.sh" }
+    - { name: "jira_properties", path: "{{ jira_base }}/atlassian-jira/WEB-INF/classes/jira-application.properties" }
+    - { name: "secrets", path: "{{ jira_data_base }}/secrets-config.yaml" }
+    - { name: "secured_dir", path: "{{ jira_data_base }}/secured" }
+    - { name: "keys_dir", path: "{{ jira_data_base }}/keys" }
+  tags: [backup_jira]
 
 - name: Ensure backup directories exist
   file:
@@ -58,86 +20,25 @@
     state: directory
     mode: '0755'
   loop:
-    - "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}_backup"
-    - "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}_backup"
-  tags: [backup_test]
+    - "{{ jira_data_backup_root }}"
+    - "{{ jira_backup_root }}"
+  tags: [backup_jira]
 
-- name: Backup dbconfig.xml
+- name: Backup Jira configuration and directories to {{ instance }}_backup
   copy:
-    src: "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}/dbconfig.xml"
-    dest: "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}_backup/dbconfig.xml"
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
     remote_src: yes
     mode: preserve
+  loop:
+    - { src: "{{ jira_data_base }}/dbconfig.xml", dest: "{{ jira_data_backup_root }}/dbconfig.xml" }
+    - { src: "{{ jira_data_base }}/eazybi.toml", dest: "{{ jira_data_backup_root }}/eazybi.toml" }
+    - { src: "{{ jira_base }}/conf/server.xml", dest: "{{ jira_backup_root }}/server.xml" }
+    - { src: "{{ jira_base }}/bin/setenv.sh", dest: "{{ jira_backup_root }}/setenv.sh" }
+    - { src: "{{ jira_base }}/atlassian-jira/WEB-INF/classes/jira-application.properties", dest: "{{ jira_backup_root }}/jira-application.properties.bak" }
+    - { src: "{{ jira_data_base }}/secrets-config.yaml", dest: "{{ jira_data_backup_root }}/secrets-config.yaml" }
+    - { src: "{{ jira_data_base }}/secured/", dest: "{{ jira_data_backup_root }}/secured/" }
+    - { src: "{{ jira_data_base }}/keys/", dest: "{{ jira_data_backup_root }}/keys/" }
   become: true
-  when: dbconfig_stat.stat.exists
-  tags: [backup_test]
+  tags: [backup_jira]
 
-- name: Backup eazybi.toml
-  copy:
-    src: "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}/eazybi.toml"
-    dest: "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}_backup/eazybi.toml"
-    remote_src: yes
-    mode: preserve
-  become: true
-  when: eazybi_stat.stat.exists
-  tags: [backup_test]
-
-- name: Backup server.xml
-  copy:
-    src: "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}/conf/server.xml"
-    dest: "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}_backup/server.xml"
-    remote_src: yes
-    mode: preserve
-  become: true
-  when: server_stat.stat.exists
-  tags: [backup_test]
-
-- name: Backup setenv.sh
-  copy:
-    src: "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}/bin/setenv.sh"
-    dest: "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}_backup/setenv.sh"
-    remote_src: yes
-    mode: preserve
-  become: true
-  when: setenv_stat.stat.exists
-  tags: [backup_test]
-
-- name: Backup jira-application.properties
-  copy:
-    src: "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}/atlassian-jira/WEB-INF/classes/jira-application.properties"
-    dest: "{{ app_base }}/{{ env }}/{{ app }}/{{ instance }}_backup/jira-application.properties.bak"
-    remote_src: yes
-    mode: preserve
-  become: true
-  when: jira_app_properties_stat.stat.exists
-  tags: [backup_test]
-
-- name: Backup secrets-config.yaml
-  copy:
-    src: "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}/secrets-config.yaml"
-    dest: "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}_backup/secrets-config.yaml"
-    remote_src: yes
-    mode: preserve
-  become: true
-  when: secrets_config_stat.stat.exists
-  tags: [backup_test]
-
-- name: Backup secured directory
-  copy:
-    src: "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}/secured/"
-    dest: "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}_backup/secured/"
-    remote_src: yes
-    mode: preserve
-  become: true
-  when: secured_dir_stat.stat.exists
-  tags: [backup_test]
-
-- name: Backup keys directory
-  copy:
-    src: "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}/keys/"
-    dest: "{{ app_data_base }}/{{ env }}/{{ app }}/{{ instance }}_backup/keys/"
-    remote_src: yes
-    mode: preserve
-  become: true
-  when: keys_dir_stat.stat.exists
-  tags: [backup_test]

@@ -38,4 +38,4 @@
     - name: Backup current config before deployment
       import_role:
         name: backup_config_test
-      tags: [backup_test]
+      tags: [backup_jira]
