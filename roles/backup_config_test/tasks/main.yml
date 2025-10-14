@@ -52,6 +52,16 @@
   register: keys_dir_stat
   tags: [backup_test]
 
+- name: Ensure backup directories exist
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - "{{ jira_data_backup_root }}"
+    - "{{ jira_backup_root }}"
+  tags: [backup_test]
+
 - name: Filter existing config files and directories
   set_fact:
     filtered_backup_file_suffixes: "{{ backup_file_suffixes | selectattr('src', 'in', existing_file_paths) | list }}"
@@ -79,7 +89,7 @@
       }}
   tags: [backup_test]
 
-- name: Backup individual config files (next to source)
+- name: Backup config files to {{ instance }}_backup folder
   copy:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
@@ -89,7 +99,7 @@
   become: true
   tags: [backup_test]
 
-- name: Backup directories (next to source)
+- name: Backup config directories to {{ instance }}_backup folder
   copy:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
