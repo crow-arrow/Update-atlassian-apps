@@ -87,7 +87,7 @@
     mode: preserve
   loop: "{{ filtered_backup_test_file_suffixes }}"
   become: true
-  tags: [backup_test_test]
+  tags: [backup_test]
 
 - name: Backup directories (next to source)
   copy:
@@ -97,4 +97,4 @@
     mode: preserve
   loop: "{{ filtered_backup_test_dir_suffixes }}"
   become: true
-  tags: [backup_test_test]
+  tags: [backup_test]
