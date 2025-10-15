@@ -84,8 +84,27 @@
   ignore_errors: true
   tags: [deploy]
 
+- name: Find all cache contents
+  ansible.builtin.find:
+    paths:
+      - "{{ app_data_path }}/caches/indexesV2"
+      - "{{ app_data_path }}/caches/tmp_attachments"
+    file_type: any
+    recurse: yes
+  register: cache_items
+  tags: [reindex]
+
+- name: Remove cache contents
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: absent
+  loop: "{{ cache_items.files }}"
+  when: cache_items.matched > 0
+  ignore_errors: true
+  tags: [reindex]
+
 - name: Remove uploaded archive files
-  file:
+  ansible.builtin.file:
     path: "{{ item }}"
     state: absent
   loop:
@@ -95,7 +114,7 @@
   tags: [deploy]
 
 - name: Remove entire backup directories (optional, set REMOVE_BACKUPS=true)
-  file:
+  ansible.builtin.file:
     path: "{{ item }}"
     state: absent
   loop:
