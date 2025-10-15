@@ -1,28 +1,61 @@
 <div style="
   position: relative;
   background: linear-gradient(135deg, #1b2d1f 20%, #000000 40%, #1b2d1f 60%);
-  padding: 20px 20px;
+  padding: 10px 20px;
   border: 2px solid #8bf771;
   border-radius: 10px;
   box-shadow: 0 4px 12px rgba(34,136,72,0.8);
   font-family: 'Lato', Arial, sans-serif;
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  gap: 20px;
+  gap: 10px;
 ">
 
   <!-- === ЛЕВАЯ КОЛОНКА === -->
-  <div style="display: flex; flex-direction: column; gap: 18px; position: relative; z-index: 1;">
+  <div style="display: flex; flex-direction: column; justify-content: space-around; gap: 4px; position: relative; z-index: 1;">
     <div style="
       font-size: 12px;
       text-transform: uppercase;
       letter-spacing: 1px;
       color: #8bf771;
     ">
-      {{ env }} Environment
+      {{ env }} {{ instance }}
+    </div>
+      <div style="font-size: 14px; color: orange;">
+      Do not store productive data!
     </div>
 
-    <div style="margin-block: 16px;">
+    <div style="
+      font-size: 8px;
+      color: #8bf771;
+    ">
+      Data Set: «{{ banner_date }}»
+    </div>
+  </div>
+
+  <!-- === СРЕДНЯЯ КОЛОНКА === -->
+  <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+
+    <div style="
+      background: linear-gradient(90deg, rgba(34,136,72,0.4) 0%, rgba(139,247,113,0.25) 100%);
+      border: 1px solid rgba(139,247,113,0.4);
+      color: #8bf771;
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-weight: 500;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      text-align: center;
+      box-shadow: 0 0 12px rgba(34,136,72,0.5);
+    ">
+      ⚠️ This system contains confidential data
+    </div>
+
+  </div>
+    
+  <!-- === ПРАВАЯ КОЛОНКА === -->
+  <div style="display: flex; flex-direction: column; align-items: end; justify-content: center;">
+    <div style="white-space: nowrap;">
       <a href="https://{{ instance }}.{{ domain_root }}/" 
         target="_blank" 
         rel="noopener noreferrer" 
@@ -34,42 +67,14 @@
           border-radius: 50px;
           padding: 12px 26px;
           box-shadow: 0 0 18px #8bf77166;
-          transition: all 0.3s ease;
+          transition: box-shadow 0.3s ease;
+          cursor: pointer;
         " 
-        onmouseover="this.style.boxShadow='0 0 30px #8bf771aa';" onmouseout="this.style.boxShadow='0 0 18px #8bf77166';
+        onmouseover="this.style.boxShadow='0 0 30px #8bf771aa'; this.querySelector('span').style.transform='translateX(6px)';"
+        onmouseout="this.style.boxShadow='0 0 18px #8bf77166'; this.querySelector('span').style.transform='translateX(0)';
       ">
-        {{ instance }} →
+        To production <span style="display:inline-block; transition:transform 0.3s ease; font-size: 20px;">→</span>
       </a>
     </div>
-
-    <div style="
-      font-size: 10px;
-      color: #8bf771;
-    ">
-      Data Set: {{ banner_date }}
-    </div>
-  </div>
-
-  <!-- === ПРАВАЯ КОЛОНКА === -->
-  <div style="display: flex; flex-direction: column; gap: 20px; align-items: center; justify-content: center;">
-    <div style="font-size: 18px; color: orange;">
-      Do not store productive data
-    </div>
-    {% if instance == "dedicated-itgm-jira" or instance == "pilot-aftersales" or instance == "mbb-jira" %}
-    <div style="
-      background: linear-gradient(90deg, rgba(34,136,72,0.4) 0%, rgba(139,247,113,0.25) 100%);
-      border: 1px solid rgba(139,247,113,0.4);
-      color: #8bf771;
-      padding: 14px 18px;
-      border-radius: 10px;
-      font-weight: 500;
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      text-align: center;
-      box-shadow: 0 0 12px rgba(34,136,72,0.5);
-    ">
-      ⚠️ This system contains confidential data
-    </div>
-    {% endif %}
   </div>
 </div>
