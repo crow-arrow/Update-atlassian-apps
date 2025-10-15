@@ -31,7 +31,6 @@
     - "{{ app_path }}/bin"
     - "{{ app_path }}/atlassian-jira/WEB-INF/classes"
     - "{{ app_data_path }}"
-  become: true
   tags: [deploy]
 
 - name: Unpack appdata.tgz
@@ -39,7 +38,6 @@
     src: "{{ upload_dir }}/{{ current_date }}_{{ instance }}_appdata.tgz"
     dest: "{{ app_path }}"
     remote_src: yes
-  ignore_errors: true
   tags: [deploy]
 
 - name: Unpack homedir.tgz
@@ -47,7 +45,6 @@
     src: "{{ upload_dir }}/{{ current_date }}_{{ instance }}_homedir.tgz"
     dest: "{{ app_data_path }}"
     remote_src: yes
-  ignore_errors: true
   tags: [deploy]
 
 - name: Restore config files
@@ -63,7 +60,6 @@
     - { src: "{{ app_backup_path }}/setenv.sh", dest: "{{ app_path }}/bin/setenv.sh" }
     - { src: "{{ app_backup_path }}/jira-application.properties.bak", dest: "{{ app_path }}/atlassian-jira/WEB-INF/classes/jira-application.properties" }
     - { src: "{{ app_data_backup_path }}/secrets-config.yaml", dest: "{{ app_data_path }}/secrets-config.yaml" }
-  ignore_errors: true
   tags: [deploy]
 
 - name: Restore secured directory
@@ -72,7 +68,6 @@
     dest: "{{ app_data_path }}/secured/"
     remote_src: yes
     mode: preserve
-  ignore_errors: true
   tags: [deploy]
 
 - name: Restore keys directory
@@ -81,27 +76,26 @@
     dest: "{{ app_data_path }}/keys/"
     remote_src: yes
     mode: preserve
-  ignore_errors: true
   tags: [deploy]
 
-- name: Find all cache contents
-  ansible.builtin.find:
-    paths:
-      - "{{ app_data_path }}/caches/indexesV2"
-      - "{{ app_data_path }}/caches/tmp_attachments"
-    file_type: any
-    recurse: yes
-  register: cache_items
-  tags: [reindex]
+# - name: Find all cache contents
+#   ansible.builtin.find:
+#     paths:
+#       - "{{ app_data_path }}/caches/indexesV2"
+#       - "{{ app_data_path }}/caches/tmp_attachments"
+#     file_type: any
+#     recurse: yes
+#   failed_when: false
+#   tags: [reindex]
 
-- name: Remove cache contents
-  ansible.builtin.file:
-    path: "{{ item.path }}"
-    state: absent
-  loop: "{{ cache_items.files }}"
-  when: cache_items.matched > 0
-  ignore_errors: true
-  tags: [reindex]
+# - name: Remove cache contents
+#   ansible.builtin.file:
+#     path: "{{ item.path }}"
+#     state: absent
+#   loop: "{{ cache_items.files }}"
+#   when: cache_items.matched > 0
+#   failed_when: false
+#   tags: [reindex]
 
 - name: Remove uploaded archive files
   ansible.builtin.file:
@@ -110,7 +104,7 @@
   loop:
     - "{{ upload_dir }}/{{ current_date }}_{{ instance }}_appdata.tgz"
     - "{{ upload_dir }}/{{ current_date }}_{{ instance }}_homedir.tgz"
-  ignore_errors: true
+  failed_when: false
   tags: [deploy]
 
 - name: Remove entire backup directories (optional, set REMOVE_BACKUPS=true)
@@ -120,6 +114,6 @@
   loop:
     - "{{ app_backup_path }}"
     - "{{ app_data_backup_path }}"
-  ignore_errors: true
+  failed_when: false
   when: REMOVE_BACKUPS | default(false) | bool
   tags: [deploy]
