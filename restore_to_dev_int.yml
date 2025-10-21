@@ -82,7 +82,7 @@
 
     - name: Push archives to target host
       import_role:
-        name: 
+        name: push_archives
       vars:
         push_action: push
       tags: [push]
