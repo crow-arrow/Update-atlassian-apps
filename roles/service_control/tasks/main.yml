@@ -10,8 +10,6 @@
     - app == "jira"
   register: stop_result
   ignore_errors: false
-  become: true
-  become_user: "{{ ENV_USER }}"
   tags: [service_control]
 
 - name: Start service
@@ -21,6 +19,4 @@
     - app == "jira"
   register: start_result
   ignore_errors: false
-  become: true  
-  become_user: "{{ ENV_USER }}"
   tags: [service_control]
