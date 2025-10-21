@@ -98,6 +98,22 @@
   failed_when: false
   tags: [deploy]
 
+- name: Ensure indexesV2 exists
+  file:
+    path: "{{ app_data_path }}/caches/indexesV2"
+    state: directory
+    owner: jira
+    group: jira
+    mode: '0755'
+
+- name: Ensure tmp_attachments exists
+  file:
+    path: "{{ app_data_path }}/caches/tmp_attachments"
+    state: directory
+    owner: jira
+    group: jira
+    mode: '0755'
+
 - name: Remove uploaded archive files
   ansible.builtin.file:
     path: "{{ item }}"
