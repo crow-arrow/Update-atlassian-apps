@@ -34,7 +34,7 @@
   </div>
 
   <!-- === СРЕДНЯЯ КОЛОНКА === -->
-  {% if instance == "dedicated-itgm-jira" or instance == "pilot-aftersales" %}
+
   <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
 
     <div style="
@@ -49,11 +49,14 @@
       text-align: center;
       box-shadow: 0 0 12px rgba(34,136,72,0.5);
     ">
+      {% if instance == "dedicated-itgm-jira" or instance == "mbb-jira" %}
       ⚠️ This system contains confidential data
+      {% else %}
+      ⚠️ This system contains test data
+      {% endif %}
     </div>
 
   </div>
-  {% endif %}
 
   <!-- === ПРАВАЯ КОЛОНКА === -->
   <div style="display: flex; flex-direction: column; align-items: end; justify-content: center;">
