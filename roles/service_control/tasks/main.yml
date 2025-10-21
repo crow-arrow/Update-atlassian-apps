@@ -13,6 +13,7 @@
   register: stop_result
   ignore_errors: false
   become: true
+  become_user: "{{ ansible_user }}"
   tags: [service_control]
 
 - name: Start service
@@ -25,4 +26,5 @@
   register: start_result
   ignore_errors: false
   become: true
+  become_user: "{{ ansible_user }}"
   tags: [service_control]
