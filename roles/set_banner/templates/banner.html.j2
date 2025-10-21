@@ -34,6 +34,7 @@
   </div>
 
   <!-- === СРЕДНЯЯ КОЛОНКА === -->
+  {% if instance == "dedicated-itgm-jira" or instance == "pilot-aftersales" %}
   <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
 
     <div style="
@@ -52,7 +53,8 @@
     </div>
 
   </div>
-    
+  {% endif %}
+
   <!-- === ПРАВАЯ КОЛОНКА === -->
   <div style="display: flex; flex-direction: column; align-items: end; justify-content: center;">
     <div style="white-space: nowrap;">
