@@ -1,60 +1,26 @@
 ---
-#- name: Set service name depending on environment
-#  set_fact:
-#    SERVICE_NAME: "{{ lookup('vars', env | upper + '_SERVICE_NAME') }}"
+# - name: Set service name depending on environment
+#   set_fact:
+#     SERVICE_NAME: "{{ lookup('vars', env | upper + '_SERVICE_NAME') }}"
 
-# - name: Stop service
-#   shell: "sudo /bin/systemctl stop {{ SERVICE_NAME }}"
-#   when:
-#     - service_action == "stop"
-#     - "'int' in group_names"
-#     - app == "jira"
-#   register: stop_result
-#   ignore_errors: false
-    # become: true
-    # become_user: "{{ ENV_USER }}"
-    # tags: [service_control]
-
-# - name: Start service
-#   shell: "sudo /bin/systemctl start {{ SERVICE_NAME }}"
-#   when:
-#     - service_action == "start"
-#     - "'int' in group_names"
-#     - app == "jira"
-#   register: start_result
-#   ignore_errors: false
-    # become: true  
-    # become_user: "{{ ENV_USER }}"
-    # tags: [service_control]
-
-- name: Stop service with stop-jira.sh
-  ansible.builtin.shell: |
-    pid_file="{{ app_base }}/{{ env }}/jira/{{ instance }}/work/catalina.pid"
-    if [ -f "$pid_file" ]; then
-      echo "PID file found — stopping Jira..."
-      {{ app_base }}/{{ env }}/jira/{{ instance }}/bin/stop-jira.sh || true
-    else
-      echo "Jira is not running — skipping stop."
-    fi
-  args:
-    executable: /bin/bash
+- name: Stop service
+  shell: "sudo /bin/systemctl stop {{ SERVICE_NAME }}"
   when:
     - service_action == "stop"
     - app == "jira"
   register: stop_result
-  failed_when: false
-  changed_when: "'stopping Jira' in stop_result.stdout"
+  ignore_errors: false
   become: true
   become_user: "{{ ENV_USER }}"
   tags: [service_control]
-    
-- name: Start service with start-jira.sh
-  ansible.builtin.shell: "{{ app_base }}/{{ env }}/jira/{{ instance }}/bin/start-jira.sh"
+
+- name: Start service
+  shell: "sudo /bin/systemctl start {{ SERVICE_NAME }}"
   when:
     - service_action == "start"
     - app == "jira"
   register: start_result
   ignore_errors: false
-  become: true
+  become: true  
   become_user: "{{ ENV_USER }}"
   tags: [service_control]

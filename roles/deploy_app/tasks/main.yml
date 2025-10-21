@@ -78,24 +78,24 @@
     mode: preserve
   tags: [deploy]
 
-# - name: Find all cache contents
-#   ansible.builtin.find:
-#     paths:
-#       - "{{ app_data_path }}/caches/indexesV2"
-#       - "{{ app_data_path }}/caches/tmp_attachments"
-#     file_type: any
-#     recurse: yes
-#   failed_when: false
-#   tags: [reindex]
+- name: Find all cache contents
+  ansible.builtin.find:
+    paths:
+      - "{{ app_data_path }}/caches/indexesV2"
+      - "{{ app_data_path }}/caches/tmp_attachments"
+    file_type: any
+    recurse: yes
+  failed_when: false
+  tags: [deploy]
 
-# - name: Remove cache contents
-#   ansible.builtin.file:
-#     path: "{{ item.path }}"
-#     state: absent
-#   loop: "{{ cache_items.files }}"
-#   when: cache_items.matched > 0
-#   failed_when: false
-#   tags: [reindex]
+- name: Remove cache contents
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: absent
+  loop: "{{ cache_items.files }}"
+  when: cache_items.matched > 0
+  failed_when: false
+  tags: [deploy]
 
 - name: Remove uploaded archive files
   ansible.builtin.file:
