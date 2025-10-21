@@ -110,8 +110,8 @@
   file:
     path: "{{ app_data_path }}/caches/tmp_attachments"
     state: directory
-    owner: jira
-    group: jira
+    owner: "{{ app }}"
+    group: polygran
     mode: '0755'
 
 - name: Remove uploaded archive files
