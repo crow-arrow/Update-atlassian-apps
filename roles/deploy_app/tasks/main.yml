@@ -85,6 +85,7 @@
       - "{{ app_data_path }}/caches/tmp_attachments"
     file_type: any
     recurse: yes
+  register: cache_items
   failed_when: false
   tags: [deploy]
 
