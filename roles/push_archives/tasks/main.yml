@@ -70,7 +70,7 @@
   delegate_to: "{{ remote_host }}"
   become: true
   become_user: "{{ ENV_USER }}"
-  when: push_action == "remove"
+  when: push_action is defined and push_action == "remove"
   tags: [push]
 
 - name: Clean up private key
