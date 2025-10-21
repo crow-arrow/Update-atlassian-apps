@@ -4,27 +4,21 @@
 #     SERVICE_NAME: "{{ lookup('vars', env | upper + '_SERVICE_NAME') }}"
 
 - name: Stop service
-  ansible.builtin.service:
-    name: "{{ SERVICE_NAME }}"
-    state: stopped
+  shell: "sudo systemctl stop {{ SERVICE_NAME }}"
   when:
     - service_action == "stop"
     - app == "jira"
   register: stop_result
   ignore_errors: false
-  become: true
-  become_user: "{{ ansible_user }}"
+  become: false
   tags: [service_control]
 
 - name: Start service
-  ansible.builtin.service:
-    name: "{{ SERVICE_NAME }}"
-    state: started
+  shell: "sudo systemctl start {{ SERVICE_NAME }}"
   when:
     - service_action == "start"
     - app == "jira"
   register: start_result
   ignore_errors: false
-  become: true
-  become_user: "{{ ansible_user }}"
+  become: false
   tags: [service_control]
