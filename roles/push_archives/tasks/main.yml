@@ -59,6 +59,19 @@
   delegate_to: "{{ inventory_hostname }}"
   tags: [push]
 
+- name: Remove transferred snapshots from PROD
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - "{{ snapshot_dir }}/{{ current_date }}_{{ instance }}.dump"
+    - "{{ snapshot_dir }}/{{ current_date }}_{{ instance }}_appdata.tgz"
+    - "{{ snapshot_dir }}/{{ current_date }}_{{ instance }}_homedir.tgz"
+  delegate_to: "{{ remote_host }}"
+  become: true
+  become_user: "{{ ENV_USER }}"
+  tags: [remove_snapshots]
+
 - name: Clean up private key
   file:
     path: "{{ ssh_key_path }}"

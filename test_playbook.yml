@@ -35,12 +35,7 @@
       when: INCLUDE_ATTACHMENTS | default(false) | bool
       tags: [sync_attachments]
 
-    - name: Backup current config before deployment
+    - name: Remove PROD snapshots
       import_role:
-        name: backup_config_test
-      tags: [backup_jira]
-
-    - name: Deploy new version from archives
-      import_role:
-        name: deploy_app_copy
-      tags: [deploy]
+        name: push_archives
+      tags: [remove_snapshots]
