@@ -82,7 +82,9 @@
 
     - name: Push archives to target host
       import_role:
-        name: push_archives
+        name: 
+      vars:
+        push_action: push
       tags: [push]
 
     - name: Clean up previous instance files

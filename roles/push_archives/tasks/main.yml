@@ -2,12 +2,13 @@
   set_fact:
     ssh_key_path: "/tmp/ssh_key.pem"
   become: false
+  when: push_action == "push"
   tags: [push]
 
 - name: Fail if SSH key is not defined
   fail:
     msg: "POLYGRAN_PRIVATE_KEY is not defined!"
-  when: lookup('env', 'POLYGRAN_PRIVATE_KEY') | length == 0
+  when: lookup('env', 'POLYGRAN_PRIVATE_KEY') | length == 0 and push_action == "push"
   become: false
   tags: [push]
 
@@ -19,6 +20,7 @@
   no_log: true
   become: false
   delegate_to: "{{ inventory_hostname }}"
+  when: push_action == "push"
   tags: [push]
 
 - name: Set SSH args to use private key
@@ -28,6 +30,7 @@
       -o UserKnownHostsFile=/dev/null
       -i {{ ssh_key_path }}
   become: false
+  when: push_action == "push"
   tags: [push]
 
 - name: Ensure upload dir exists
@@ -35,6 +38,7 @@
     path: "{{ upload_dir }}"
     state: directory
   become: false
+  when: push_action == "push"
   tags: [push]
 
 - name: Rsync archives from PROD to {{ env }} using SSH key
@@ -57,6 +61,7 @@
       - "--no-perms"
   become: false
   delegate_to: "{{ inventory_hostname }}"
+  when: push_action == "push"
   tags: [push]
 
 - name: Remove transferred snapshots from PROD
@@ -70,7 +75,7 @@
   delegate_to: "{{ remote_host }}"
   become: true
   become_user: "{{ ENV_USER }}"
-  when: push_action is defined and push_action == "remove"
+  when: push_action == "remove"
   tags: [push]
 
 - name: Clean up private key
@@ -79,5 +84,5 @@
     state: absent
   become: false
   delegate_to: "{{ inventory_hostname }}"
-  when: push_action is defined and push_action == "remove"
+  when: push_action == "remove"
   tags: [push]
