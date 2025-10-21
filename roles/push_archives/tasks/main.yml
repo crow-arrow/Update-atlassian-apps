@@ -79,5 +79,5 @@
     state: absent
   become: false
   delegate_to: "{{ inventory_hostname }}"
-  when: push_action == "remove"
+  when: push_action is defined and push_action == "remove"
   tags: [push]
