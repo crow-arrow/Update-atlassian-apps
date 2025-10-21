@@ -70,6 +70,7 @@
   delegate_to: "{{ remote_host }}"
   become: true
   become_user: "{{ ENV_USER }}"
+  when: push_action == "remove"
   tags: [push]
 
 - name: Clean up private key
@@ -78,4 +79,5 @@
     state: absent
   become: false
   delegate_to: "{{ inventory_hostname }}"
+  when: push_action == "remove"
   tags: [push]

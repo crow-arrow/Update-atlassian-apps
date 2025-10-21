@@ -148,4 +148,11 @@
         service_action: start
       tags: [service_control]
 
+    - name: Remove archives and key
+      import_role:
+        name: push_archives
+      vars:
+        push_action: remove
+      tags: [push]
+
 
