@@ -38,4 +38,4 @@
     - name: Remove PROD snapshots
       import_role:
         name: push_archives
-      tags: [remove_snapshots]
+      tags: [push]
