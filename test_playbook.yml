@@ -1,5 +1,5 @@
 - name: Restore app to {{ env }} environment
-  hosts: "{{ instance }}-{{ env }}"
+  hosts: "{{ target_host }}"
   become: true
   become_user: "{{ ENV_USER }}"
   gather_facts: true
@@ -8,7 +8,7 @@
     current_date: "{{ lookup('pipe', 'date +%Y%m%d') }}"
 
   vars_files:
-    - "inventories/{{ env }}/group_vars/{{ instance }}/vault.yml"
+    - "inventories/{{ env }}/group_vars/{{ target_host }}/vault.yml"
 
   tasks:
 

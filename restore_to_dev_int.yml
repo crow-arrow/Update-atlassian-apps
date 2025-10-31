@@ -1,6 +1,6 @@
 ---
 - name: Archive and transfer app snapshots from production
-  hosts: "{{ instance }}"
+  hosts: "{{ target_host }}"
   become: true
   become_user: "{{ ENV_USER }}"
   gather_facts: true
@@ -9,7 +9,7 @@
     current_date: "{{ lookup('pipe', 'date +%Y%m%d') }}"
 
   vars_files:
-    - inventories/production/group_vars/{{ instance }}/vault.yml
+    - inventories/production/group_vars/{{ target_host }}/vault.yml
 
   pre_tasks:
     - name: Validate critical vars for snapshot_app role
@@ -39,7 +39,7 @@
       tags: [snapshot]
       
 - name: Restore app to {{ env }} environment
-  hosts: "{{ instance }}-{{ env }}"
+  hosts: "{{ target_host }}-{{ env }}"
   become: true
   become_user: "{{ ENV_USER }}"
   gather_facts: true
@@ -48,7 +48,7 @@
     current_date: "{{ lookup('pipe', 'date +%Y%m%d') }}"
 
   vars_files:
-    - "inventories/{{ env }}/group_vars/{{ instance }}/vault.yml"
+    - "inventories/{{ env }}/group_vars/{{ target_host }}/vault.yml"
 
   pre_tasks:
   - name: Validate restore input vars
